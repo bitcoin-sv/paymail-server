@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  paymail:
+    image: paymail.service
+    environment:
+      - DB_DSN=user=postgres password=root dbname=paymail sslmode=disable host=host.docker.internal port=15433
+      - DB_SCHEMA_PATH=/migrations
+      - DB_TYPE=postgres
+    depends_on:
+      paymail_postgres:
+        condition: service_healthy
+
+  paymail_postgres:
+    container_name: paymail_postgres
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: paymail
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - 15433:5432
+    restart: unless-stopped
+    command: postgres -c ssl=on -c ssl_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem -c ssl_key_file=/etc/ssl/private/ssl-cert-snakeoil.key -c 'max_connections=1000'
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres-data:

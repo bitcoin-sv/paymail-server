@@ -1,0 +1,34 @@
+version: '3.7'
+
+services:
+  paymail:
+    image: paymail.service
+    environment:
+      - DB_DSN=root:dev@tcp(paymail_mysql:3306)/paymail
+      - DB_SCHEMA_PATH=/migrations
+      - DB_TYPE=mysql
+    depends_on:
+      paymail_mysql:
+        condition: service_started
+
+  paymail_mysql:
+    container_name: paymail_mysql
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      interval: 10s
+      retries: 20
+      test: "echo 'SELECT count(*) FROM paymail.accounts' | mysql --silent -u root --password=dev"
+    environment:
+      MYSQL_DATABASE: paymail
+      MYSQL_ROOT_PASSWORD: dev
+    cap_add:
+      - SYS_NICE
+    ports:
+      - "3306:3306"
+
+volumes:
+  mysql-data:
