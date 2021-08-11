@@ -3,8 +3,10 @@ package web
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/labstack/echo"
@@ -215,6 +217,49 @@ func TestPublicProfile(t *testing.T) {
 
 				assert.Equal(t, test.code, rec.Code)
 				assert.Equal(t, test.exp, profile)
+			}
+		})
+	}
+}
+
+func TestPaymentDestination(t *testing.T) {
+	e := echo.New()
+	svc := service.NewPaymailService(&mocks.AccountReaderWriterMock{
+		AccountFunc: func(context.Context, paymail.Handle) (*paymail.PublicAccount, error) {
+			return &paymail.PublicAccount{}, nil
+		},
+		CreateFunc: func(context.Context, paymail.Account) error { return nil },
+	}, "somedomain.com")
+	a := NewBsvAlias(svc)
+	a.RegisterRoutes(e.Group(""))
+
+	tests := map[string]struct {
+		handle string
+		json   string
+		err    error
+	}{
+		"should return 400 when no payment request": {
+			err: errors.New("code=400, message=Request body can't be empty"),
+		},
+		"should not return error when valid request": {
+			handle: "bob@mypaymail.com",
+			json:   `{"satoshis":100100}`,
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			req := httptest.NewRequest(http.MethodPost, routePaymentDestination, strings.NewReader(test.json))
+			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+			rec := httptest.NewRecorder()
+			ctx := e.NewContext(req, rec)
+			err := a.PaymentDestination(ctx)
+
+			ctx.SetParamNames("handle")
+			ctx.SetParamValues(test.handle)
+
+			if err != nil {
+				assert.EqualError(t, err, test.err.Error())
 			}
 		})
 	}
