@@ -96,20 +96,13 @@ type (
 		Signature string `json:"signature"`
 		Note      string `json:"note"`
 	}
-
-	PaymentRequest struct {
-		Satoshis uint64 `json:"satoshis"`
-	}
-
 	PaymentDestination struct {
 		Outputs   []*PaymentOutput `json:"outputs"`   // A list of outputs
 		Reference string           `json:"reference"` // A reference for the payment, created by the receiver of the transaction
 	}
 
 	PaymentOutput struct {
-		Address  string `json:"address,omitempty"`  // Hex encoded locking script
-		Satoshis uint64 `json:"satoshis,omitempty"` // Number of satoshis for that output
-		Script   string `json:"script"`             // Hex encoded locking script
+		Output string `json:"output"` // Hex encoded locking script
 	}
 
 	// AccountService enforces validation of arguments and business rules.

@@ -44,12 +44,13 @@ func (b *bsvalias) PKI(e echo.Context) error {
 
 func (b *bsvalias) PaymentDestination(e echo.Context) error {
 	handle := paymail.Handle(e.Param("handle"))
-	paymentRequest := new(paymail.PaymentRequest)
-	if err := e.Bind(paymentRequest); err != nil {
+	senderRequest := new(paymail.SenderRequest)
+	if err := e.Bind(senderRequest); err != nil {
 		return e.JSON(http.StatusBadRequest, nil)
 	}
 
 	account, err := b.svc.Account(e.Request().Context(), handle)
+
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -57,16 +58,16 @@ func (b *bsvalias) PaymentDestination(e echo.Context) error {
 		return e.JSON(http.StatusNotFound, nil)
 	}
 
-	output := &paymail.PaymentOutput{
-		Address:  account.Address,
-		Satoshis: paymentRequest.Satoshis,
-	}
-
-	if output.Script, err = bitcoin.ScriptFromAddress(account.Address); err != nil {
+	output := &paymail.PaymentOutput{}
+	if output.Output, err = bitcoin.ScriptFromAddress(account.Address); err != nil {
 		return errors.WithStack(err)
 	}
 
 	return e.JSON(http.StatusOK, output)
+}
+
+func (b *bsvalias) PaymentDestinationResponse(e echo.Context) error {
+	return nil
 }
 
 func (b *bsvalias) PublicProfile(e echo.Context) error {

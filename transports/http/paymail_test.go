@@ -223,44 +223,72 @@ func TestPublicProfile(t *testing.T) {
 }
 
 func TestPaymentDestination(t *testing.T) {
-	e := echo.New()
-	svc := service.NewPaymailService(&mocks.AccountReaderWriterMock{
-		AccountFunc: func(context.Context, paymail.Handle) (*paymail.PublicAccount, error) {
-			return &paymail.PublicAccount{}, nil
-		},
-		CreateFunc: func(context.Context, paymail.Account) error { return nil },
-	}, "somedomain.com")
-	a := NewBsvAlias(svc)
-	a.RegisterRoutes(e.Group(""))
-
 	tests := map[string]struct {
-		handle string
-		json   string
-		err    error
+		mockAccFunc func(ctx context.Context, handle paymail.Handle) (*paymail.PublicAccount, error)
+		handle      string
+		json        string
+		code        int
+		exp         *paymail.PaymentOutput
+		err         error
 	}{
 		"should return 400 when no payment request": {
-			err: errors.New("code=400, message=Request body can't be empty"),
+			mockAccFunc: func(ctx context.Context, handle paymail.Handle) (*paymail.PublicAccount, error) {
+				return nil, nil
+			},
+			err:  errors.New("code=400, message=Request body can't be empty"),
+			code: http.StatusBadRequest,
 		},
-		"should not return error when valid request": {
+		"should return 404 for non-existant user": {
 			handle: "bob@mypaymail.com",
-			json:   `{"satoshis":100100}`,
+			code:   http.StatusBadRequest,
+			mockAccFunc: func(ctx context.Context, handle paymail.Handle) (*paymail.PublicAccount, error) {
+				return nil, nil
+			},
+		},
+		"should return output for valid request": {
+			handle: "bob@mypaymail.com",
+			code:   http.StatusOK,
+			mockAccFunc: func(ctx context.Context, handle paymail.Handle) (*paymail.PublicAccount, error) {
+				return &paymail.PublicAccount{
+					Alias:     "bob",
+					Handle:    "bob@mypaymail.com",
+					Name:      "Bob Bobford",
+					PublicKey: "03165ba5f5fd1152e1836125e0340753f6780367fcb29f8a6c7e7c9137680ec587",
+					Address:   "1CNCQiS28xr7S91SmZMzWrz6YuQrkitcNB",
+				}, nil
+			},
+			json: `{"senderName": "Alice Bobford", "senderHandle": "alice@mypaymail.com"}`,
+			exp:  &paymail.PaymentOutput{Output: "76a9147caba4786a2f2a955b66d278ed98a1ccc4dabc9688ac"},
 		},
 	}
 
 	for name, test := range tests {
+		e := echo.New()
+		svc := service.NewPaymailService(&mocks.AccountReaderWriterMock{
+			AccountFunc: test.mockAccFunc,
+			CreateFunc:  func(ctx context.Context, account paymail.Account) error { return nil },
+		}, "somedomain.com")
+		a := NewBsvAlias(svc)
+		a.RegisterRoutes(e.Group(""))
+
 		t.Run(name, func(t *testing.T) {
 			req := httptest.NewRequest(http.MethodPost, routePaymentDestination, strings.NewReader(test.json))
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 			rec := httptest.NewRecorder()
 			ctx := e.NewContext(req, rec)
-			err := a.PaymentDestination(ctx)
-
 			ctx.SetParamNames("handle")
 			ctx.SetParamValues(test.handle)
 
+			err := a.PaymentDestination(ctx)
+
+			assert.Equal(t, test.code, rec.Code)
 			if err != nil {
 				assert.EqualError(t, err, test.err.Error())
+				return
 			}
+			var output *paymail.PaymentOutput
+			json.Unmarshal(rec.Body.Bytes(), &output)
+			assert.Equal(t, test.exp, output)
 		})
 	}
 }
