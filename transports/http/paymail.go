@@ -42,6 +42,8 @@ func (b *bsvalias) PKI(e echo.Context) error {
 	})
 }
 
+// PaymentDestination obtains the preferred output script for a future transaction.
+// Ref: https://docs.moneybutton.com/docs/paymail/paymail-04-payment-addressing.html
 func (b *bsvalias) PaymentDestination(e echo.Context) error {
 	handle := paymail.Handle(e.Param("handle"))
 	senderRequest := new(paymail.SenderRequest)

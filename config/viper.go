@@ -18,6 +18,7 @@ func NewViperConfig(appname string) *Config {
 func (c *Config) WithServer() *Config {
 	viper.SetDefault(EnvServerPort, ":4000")
 	viper.SetDefault(EnvServerHost, "localhost:4000")
+	viper.SetDefault(EnvServerDomain, "localhost:4000")
 	c.Server = &Server{
 		Port:     viper.GetString(EnvServerPort),
 		Hostname: viper.GetString(EnvServerHost),

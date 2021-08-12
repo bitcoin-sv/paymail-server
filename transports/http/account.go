@@ -31,5 +31,5 @@ func (a *account) Account(e echo.Context) error {
 	if err := a.svc.Create(e.Request().Context(), args); err != nil {
 		return errors.WithStack(err)
 	}
-	return e.JSON(http.StatusCreated, struct{}{})
+	return e.JSON(http.StatusCreated, nil)
 }
