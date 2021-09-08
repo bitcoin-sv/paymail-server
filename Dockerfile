@@ -6,15 +6,14 @@ COPY . .
 
 RUN VER=$(git describe --tags) && \
   GIT_COMMIT=$(git rev-parse HEAD) && \
-  CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w -X main.commit=${GIT_COMMIT} -X main.version=${VER}" ./cmd/grpc-server
+  CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w -X main.commit=${GIT_COMMIT} -X main.version=${VER}" ./cmd/http-server
 
 # Stage 2 - the production environment
 FROM scratch
 WORKDIR /app
 COPY --from=build-env /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
-COPY --from=build-env /bin/grpc_health_probe /bin/
-COPY --from=build-env /app/grpc-server /app/
+COPY --from=build-env /app/http-server /app/
 COPY --from=build-env /app/settings.conf /app/
 EXPOSE 9020
 
-CMD ["/app/grpc-server"]
+CMD ["/app/http-server"]

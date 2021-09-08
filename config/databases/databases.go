@@ -15,7 +15,7 @@ type dbSetups map[config.DbType]dbSetupFunc
 // ready for being called in main.go.
 func NewDbSetup() dbSetups {
 	s := make(map[config.DbType]dbSetupFunc, 2)
-	s[config.DBMySql] = setupMySqlDB
+	s[config.DBMySQL] = setupMySQLDB
 	s[config.DBPostgres] = setupPostgresDB
 	return s
 }

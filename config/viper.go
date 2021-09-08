@@ -67,7 +67,7 @@ func (c *Config) WithDb() *Config {
 	return c
 }
 
-// WithCapability
+// WithCapability sets up the capbability for current instance of paymail.
 func (c *Config) WithCapability() *Config {
 	domain := viper.GetString(EnvServerDomain)
 	viper.SetDefault(EnvBSVAliasVersion, "1.0")

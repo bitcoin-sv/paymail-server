@@ -15,7 +15,7 @@ import (
 	"github.com/nch-bowstave/paymail/config"
 )
 
-func setupMySqlDB(c *config.Db) (*sqlx.DB, error) {
+func setupMySQLDB(c *config.Db) (*sqlx.DB, error) {
 	db, err := sqlx.Open("mysql", c.Dsn)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to setup database")

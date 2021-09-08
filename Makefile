@@ -1,7 +1,7 @@
 SHELL=/bin/bash
 
-run-grpc-server:
-	@go run -race cmd/grpc-server/main.go
+run-server:
+	@go run -race cmd/http-server/main.go
 
 run-all-tests: run-linter run-unit-tests
 

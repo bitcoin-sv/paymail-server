@@ -27,10 +27,10 @@ func (p *paymailService) Create(ctx context.Context, req paymail.AccountArgs) er
 		return err
 	}
 	account := paymail.Account{
-		Handle:    string(req.Alias) + "@" + p.domain,
-		Alias:     string(req.Alias),
+		Handle:    req.Alias + "@" + p.domain,
+		Alias:     req.Alias,
 		Name:      req.Name,
-		AvatarUrl: req.AvatarUrl,
+		AvatarURL: req.AvatarURL,
 		Email:     req.Email,
 		Mobile:    req.Mobile,
 	}

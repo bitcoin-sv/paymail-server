@@ -8,10 +8,10 @@ import (
 )
 
 type (
-	// Alias is the users alias
+	// Alias is the users alias.
 	Alias string
 
-	//Handle
+	//Handle is the users paymail handle.
 	Handle string
 
 	// AccountArgs is the account creation fields.
@@ -20,7 +20,7 @@ type (
 		Name      string `json:"name" db:"name"`
 		Email     string `json:"email" db:"email"`
 		Mobile    string `json:"mobile" db:"mobile"`
-		AvatarUrl string `json:"avatar_url" db:"avatar_url"`
+		AvatarURL string `json:"avatar_url" db:"avatar_url"`
 	}
 
 	// Account is the structure for a paymail account.
@@ -29,7 +29,7 @@ type (
 		Name       string `json:"name" db:"name"`
 		Email      string `json:"email" db:"email"`
 		Mobile     string `json:"mobile" db:"mobile"`
-		AvatarUrl  string `json:"avatar_url" db:"avatar_url"`
+		AvatarURL  string `json:"avatar_url" db:"avatar_url"`
 		PrivateKey string `db:"private_key"`
 		PublicKey  string `json:"pubKey" db:"public_key"`
 		Handle     string `json:"handle" db:"handle"`
@@ -41,14 +41,14 @@ type (
 		Alias     string `json:"alias" db:"alias"`
 		Handle    string `json:"handle" db:"handle"`
 		Name      string `json:"name" db:"name"`
-		AvatarUrl string `json:"avatar_url" db:"avatar_url"`
+		AvatarURL string `json:"avatar_url" db:"avatar_url"`
 		PublicKey string `json:"pubKey" db:"public_key"`
 		Address   string `json:"address" db:"address"`
 	}
 
 	//PublicProfile is the public profile endpoint for a user.
 	PublicProfile struct {
-		AvatarUrl string `json:"avatar_url" db:"avatar_url"`
+		AvatarURL string `json:"avatar_url" db:"avatar_url"`
 		Name      string `json:"name" db:"name"`
 	}
 
@@ -65,7 +65,7 @@ type (
 		PublicKey string `json:"pubKey"`
 	}
 
-	// SenderRequest
+	// SenderRequest is the structure for a payment request.
 	SenderRequest struct {
 		Name      string    `json:"senderName"`
 		Handle    string    `json:"senderHandle"`
@@ -89,18 +89,21 @@ type (
 		Reference string `json:"reference"`
 	}
 
-	// MetaData
+	// MetaData contains extra information used in payment request args.
 	MetaData struct {
 		Sender    string `json:"sender"`
 		PublicKey string `json:"pubkey"`
 		Signature string `json:"signature"`
 		Note      string `json:"note"`
 	}
+
+	// PaymentDestination contains a list of outputs and a reference created by the receiver of the transaction.
 	PaymentDestination struct {
 		Outputs   []*PaymentOutput `json:"outputs"`   // A list of outputs
 		Reference string           `json:"reference"` // A reference for the payment, created by the receiver of the transaction
 	}
 
+	// PaymentOutput is the transaction locking script.
 	PaymentOutput struct {
 		Output string `json:"output"` // Hex encoded locking script
 	}
@@ -128,13 +131,15 @@ type (
 		AccountWriter
 	}
 
+	// Domain is the current domain (tld).
 	Domain interface {
 		Verify(handle Handle) bool
 	}
 )
 
+// Validate is used to check if email address is valid.
 func (a *AccountArgs) Validate() error {
-	_, err := mail.ParseAddress(string(a.Email))
+	_, err := mail.ParseAddress(a.Email)
 	if err != nil {
 		return errors.New("invalid email address")
 	}

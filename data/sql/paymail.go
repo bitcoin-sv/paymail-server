@@ -36,7 +36,7 @@ func NewPaymailDb(db *sqlx.DB, dbType config.DbType) *paymailDb {
 		dbType: dbType,
 		db:     db,
 		sqls: map[config.DbType]map[string]string{
-			config.DBMySql: {
+			config.DBMySQL: {
 				insertAccount: insertAccount,
 			},
 			config.DBPostgres: {

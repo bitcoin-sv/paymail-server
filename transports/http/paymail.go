@@ -82,7 +82,7 @@ func (b *bsvalias) PublicProfile(e echo.Context) error {
 		return e.JSON(http.StatusNotFound, nil)
 	}
 	return e.JSON(http.StatusOK, &paymail.PublicProfile{
-		AvatarUrl: account.AvatarUrl,
+		AvatarURL: account.AvatarURL,
 		Name:      account.Name,
 	})
 }
@@ -98,7 +98,7 @@ func (b *bsvalias) Verify(e echo.Context) error {
 		return errors.WithStack(err)
 	}
 	if verification == nil {
-		e.JSON(http.StatusNotFound, nil)
+		return e.JSON(http.StatusNotFound, nil)
 	}
 	return e.JSON(http.StatusOK, verification)
 }

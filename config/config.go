@@ -37,7 +37,7 @@ var reDbType = regexp.MustCompile(`mysql|postgres`)
 
 // Supported database types.
 const (
-	DBMySql    DbType = "mysql"
+	DBMySQL    DbType = "mysql"
 	DBPostgres DbType = "postgres"
 )
 

@@ -25,7 +25,7 @@ func TestVerify(t *testing.T) {
 		exp         *paymail.Verification
 		code        int
 	}{
-		"should return 404 for non-existant paymail": {
+		"should return 404 for non-existent paymail": {
 			mockAccFunc: func(ctx context.Context, hanlde paymail.Handle) (*paymail.PublicAccount, error) {
 				return nil, nil
 			},
@@ -179,14 +179,14 @@ func TestPublicProfile(t *testing.T) {
 		"should return 200 and profile for valid handle": {
 			mockAccFunc: func(ctx context.Context, handle paymail.Handle) (*paymail.PublicAccount, error) {
 				return &paymail.PublicAccount{
-					AvatarUrl: "https://somedomain.com/avatar",
+					AvatarURL: "https://somedomain.com/avatar",
 					Name:      "Bob Bobson",
 				}, nil
 			},
 			code:   http.StatusOK,
 			handle: "bob@somedomain.com",
 			exp: &paymail.PublicProfile{
-				AvatarUrl: "https://somedomain.com/avatar",
+				AvatarURL: "https://somedomain.com/avatar",
 				Name:      "Bob Bobson",
 			},
 		},
@@ -238,7 +238,7 @@ func TestPaymentDestination(t *testing.T) {
 			err:  errors.New("code=400, message=Request body can't be empty"),
 			code: http.StatusBadRequest,
 		},
-		"should return 404 for non-existant user": {
+		"should return 404 for non-existent user": {
 			handle: "bob@mypaymail.com",
 			code:   http.StatusBadRequest,
 			mockAccFunc: func(ctx context.Context, handle paymail.Handle) (*paymail.PublicAccount, error) {
