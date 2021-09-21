@@ -65,6 +65,7 @@ func main() {
 	web.NewCapability(cfg.Paymail).RegisterRoutes(g)
 	web.NewAccount(paymailService).RegisterRoutes(g)
 	web.NewBsvAlias(paymailService).RegisterRoutes(g)
+	web.NewPKI(paymailService).RegisterRoutes(g)
 
 	e.Logger.Fatal(e.Start(cfg.Server.Port))
 }

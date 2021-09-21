@@ -5,7 +5,7 @@ services:
     image: paymail.service
     environment:
       - DB_DSN=user=postgres password=root dbname=paymail sslmode=disable host=host.docker.internal port=15433
-      - DB_SCHEMA_PATH=/migrations
+      - DB_SCHEMA_PATH=/data/migrations
       - DB_TYPE=postgres
     depends_on:
       paymail_postgres:

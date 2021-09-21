@@ -21,7 +21,7 @@ func NewPaymailService(rw paymail.AccountReaderWriter, domain string) *paymailSe
 	}
 }
 
-// Create
+// Create creates a new user account.
 func (p *paymailService) Create(ctx context.Context, req paymail.AccountArgs) error {
 	if err := req.Validate(); err != nil {
 		return err
@@ -54,7 +54,7 @@ func (p *paymailService) Create(ctx context.Context, req paymail.AccountArgs) er
 	return nil
 }
 
-// Account
+// Account returns an account for a user.
 func (p *paymailService) Account(ctx context.Context, args paymail.Handle) (*paymail.PublicAccount, error) {
 	return p.rw.Account(ctx, args)
 }
