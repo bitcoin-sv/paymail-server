@@ -1,0 +1,8 @@
+title: Send raw transaction
+authors:
+  - Miguel Duarte (Money Button)
+  - Ryan X. Charles (Money Button)
+  - Ivan Mlinaric (Handcash)
+  - Rafa (Handcash)
+version: 1.1
+callback: /p2pRawTx/{alias}@{domain.tld}

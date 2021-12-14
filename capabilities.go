@@ -2,6 +2,7 @@ package paymail
 
 import (
 	"encoding/hex"
+	"fmt"
 	"strings"
 
 	"github.com/libsv/go-bt"
@@ -18,9 +19,9 @@ type CapabilitiesDocument struct {
 
 // Capability is a single capablity as defined by some brfcid specification.
 type Capability struct {
-	Title    string   `yaml:"title,omitempty" json:"omit"`
-	Authors  []string `yaml:"authors,omitempty" json:"omit"`
-	Version  string   `yaml:"version,omitempty" json:"omit"`
+	Title    string   `yaml:"title,omitempty" json:"-"`
+	Authors  []string `yaml:"authors,omitempty" json:"-"`
+	Version  string   `yaml:"version,omitempty" json:"-"`
 	Callback string   `yaml:"callback,omitempty" json:"callback,omitempty"`
 }
 
@@ -45,13 +46,17 @@ func GenerateBrfcID(c *Capability) string {
 		cat = append(cat, []byte(strings.TrimSpace(c.Title))...)
 	}
 	if c.Authors != nil && len(c.Authors) > 0 {
-		for _, author := range c.Authors {
+		for idx, author := range c.Authors {
+			if idx > 0 {
+				cat = append(cat, []byte(", ")...)
+			}
 			cat = append(cat, []byte(strings.TrimSpace(author))...)
 		}
 	}
 	if c.Version != "" {
 		cat = append(cat, []byte(strings.TrimSpace(c.Version))...)
 	}
+	fmt.Println(string(cat))
 	return hex.EncodeToString(bt.ReverseBytes(crypto.Sha256d(cat)[26:]))
 }
 

@@ -62,7 +62,6 @@ func main() {
 	paymailStore := sql.NewPaymailDb(db, cfg.Db.Type)
 	paymailService := service.NewPaymailService(paymailStore, cfg.Paymail.Domain)
 
-	web.NewCapability(cfg.Paymail).RegisterRoutes(g)
 	web.NewAccount(paymailService).RegisterRoutes(g)
 	web.NewBsvAlias(paymailService).RegisterRoutes(g)
 	web.NewPKI(paymailService).RegisterRoutes(g)
