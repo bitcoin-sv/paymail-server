@@ -65,6 +65,7 @@ github.com/lib/pq
 github.com/lib/pq/oid
 github.com/lib/pq/scram
 # github.com/libsv/go-bt v1.0.0-beta
+## explicit
 github.com/libsv/go-bt
 github.com/libsv/go-bt/bscript
 github.com/libsv/go-bt/crypto
@@ -105,8 +106,6 @@ github.com/subosito/gotenv
 # github.com/theflyingcodr/govalidator v0.0.2
 ## explicit
 github.com/theflyingcodr/govalidator
-# github.com/theflyingcodr/lathos v0.0.1
-## explicit
 # github.com/valyala/bytebufferpool v1.0.0
 github.com/valyala/bytebufferpool
 # github.com/valyala/fasttemplate v1.2.1
@@ -131,6 +130,7 @@ golang.org/x/text/unicode/norm
 # gopkg.in/ini.v1 v1.62.0
 gopkg.in/ini.v1
 # gopkg.in/yaml.v2 v2.4.0
+## explicit
 gopkg.in/yaml.v2
 # gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 gopkg.in/yaml.v3
