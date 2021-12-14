@@ -1,0 +1,7 @@
+title: bsvalias Public Key Infrastructure
+authors:
+  - andy (nChain)
+  - Ryan X. Charles (Money Button)
+version: 1
+callback: /pki/{alias}@{domain.tld}
+readme: https://docs.moneybutton.com/docs/paymail/paymail-03-public-key-infrastructure.html

@@ -2,7 +2,7 @@ package paymail
 
 import (
 	"encoding/hex"
-	"fmt"
+	"encoding/json"
 	"strings"
 
 	"github.com/libsv/go-bt"
@@ -23,6 +23,7 @@ type Capability struct {
 	Authors  []string `yaml:"authors,omitempty" json:"-"`
 	Version  string   `yaml:"version,omitempty" json:"-"`
 	Callback string   `yaml:"callback,omitempty" json:"callback,omitempty"`
+	Readme   string   `yaml:"readme,omitempty" json:"readme,omitempty"`
 }
 
 // AddCapability is a function for dynamically adding capabilities from a yaml file.
@@ -56,21 +57,28 @@ func GenerateBrfcID(c *Capability) string {
 	if c.Version != "" {
 		cat = append(cat, []byte(strings.TrimSpace(c.Version))...)
 	}
-	fmt.Println(string(cat))
 	return hex.EncodeToString(bt.ReverseBytes(crypto.Sha256d(cat)[26:]))
 }
 
-func GenerateCapabilitiesDocument() (*CapabilitiesDocument, error) {
+func GenerateCapabilitiesDocument() error {
 	var capabilities CapabilitiesDocument
 	files, err := data.CapabilitiesData.LoadAll()
 	if err != nil {
-		return nil, err
+		return err
 	}
 	for _, data := range files {
-		err := capabilities.AddCapability(data)
+		err = capabilities.AddCapability(data)
 		if err != nil {
-			return nil, err
+			return err
 		}
 	}
-	return &capabilities, nil
+	d, err := json.Marshal(capabilities)
+	if err != nil {
+		return err
+	}
+	err = data.CapabilitiesData.OverwriteFile("capabilities.json", d)
+	if err != nil {
+		return err
+	}
+	return nil
 }

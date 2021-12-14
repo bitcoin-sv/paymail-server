@@ -1,0 +1,5 @@
+title: Peer Channel Connections
+authors:
+  - Deggen (nChain)
+version: 1.0
+callback: /peer/{alias}@{domain.tld}
