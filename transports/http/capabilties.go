@@ -9,8 +9,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-type bsvalias struct {
-	svc paymail.AccountService
+type PaymailService struct {
+	svc AccountService
 }
 
 // NewBsvAlias will create a new bsvalias transport.

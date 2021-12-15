@@ -5,19 +5,24 @@ import (
 
 	"github.com/bitcoinschema/go-bitcoin"
 	"github.com/nch-bowstave/paymail"
+	"github.com/nch-bowstave/paymail/config"
 	"github.com/pkg/errors"
 )
 
 type paymailService struct {
-	domain string
-	rw     paymail.AccountReaderWriter
+	domain  string
+	paymail string
+	payd    string // this would need to be a connection to a payd api essentially.
+	p4      string
 }
 
 // NewPaymailService
-func NewPaymailService(rw paymail.AccountReaderWriter, domain string) *paymailService {
+func NewPaymailService(cfg config.Config) *paymailService {
 	return &paymailService{
-		domain: domain,
-		rw:     rw,
+		domain:  cfg.Paymail.Domain,
+		paymail: cfg.Paymail.Hostname + ":" + cfg.Paymail.Port,
+		payd:    cfg.PayD.Hostname + ":" + cfg.PayD.Port,
+		p4:      cfg.P4.Hostname + ":" + cfg.P4.Port,
 	}
 }
 
