@@ -1,5 +1,7 @@
 title: Peer Channel Connections
 authors:
+  - Kapil (nChain)
+  - Jad (nChain)
   - Deggen (nChain)
 version: 1.0
 callback: /peer/{alias}@{domain.tld}

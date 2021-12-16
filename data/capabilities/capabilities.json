@@ -1,0 +1,1 @@
+{"version":"","capabilities":{"0f9681ab58f0":{"callback":"/pki/{alias}@{domain.tld}","readme":"https://docs.moneybutton.com/docs/paymail/paymail-03-public-key-infrastructure.html"},"2a40af698840":{"callback":"/p2pDest/{alias}@{domain.tld}"},"56944c5d3f98":{},"5f1323cddf31":{"callback":"/p2pRawTx/{alias}@{domain.tld}"},"bb8eb6502851":{"callback":"/peer/{alias}@{domain.tld}"}}}

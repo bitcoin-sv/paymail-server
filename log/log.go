@@ -1,7 +1,7 @@
 package log
 
 import (
-	"github.com/libsv/p4-server/config"
+	"github.com/nch-bowstave/paymail/config"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"

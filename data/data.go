@@ -4,6 +4,8 @@ import (
 	"embed"
 	"os"
 	"path"
+
+	"github.com/pkg/errors"
 )
 
 // Directory a directory container capability data.
@@ -38,8 +40,19 @@ func (d *Directory) LoadAll() ([][]byte, error) {
 	return allFileData, nil
 }
 
-// OverwriteFile is self explanitory
-func (d *Directory) OverwriteFile(name string, data []byte) error {
-	_ = os.Remove(d.prefix + "/" + name)
-	return os.WriteFile("capabilities.json", data, 0600)
+// LoadStaticDocument will return the generated document if it exists.
+func (d *Directory) LoadStaticDocument() ([]byte, error) {
+	data, err := d.fs.ReadFile(d.prefix + "/capabilities.json")
+	if err != nil {
+		return nil, errors.Wrap(err, "you have to run the setup to generate the static capabilities.json")
+	}
+	return data, nil
+}
+
+// OverwriteStaticCapabilitiesFile is self explanitory, however the important note is that this filepath is relative.
+// The capabilities_test.go and main.go must remain in the same order of nested folders otherwise this filepath will fail.
+func OverwriteStaticCapabilitiesFile(data []byte) error {
+	path := "../../data/capabilities/capabilities.json"
+	_ = os.Remove(path)
+	return os.WriteFile(path, data, 0600)
 }

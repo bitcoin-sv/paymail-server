@@ -9,14 +9,16 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/libsv/p4-server/data"
-	"github.com/libsv/p4-server/data/payd"
-	"github.com/libsv/p4-server/data/sockets"
-	"github.com/libsv/p4-server/docs"
-	"github.com/libsv/p4-server/log"
 	p4Handlers "github.com/libsv/p4-server/transports/http"
 	p4Middleware "github.com/libsv/p4-server/transports/http/middleware"
 	p4soc "github.com/libsv/p4-server/transports/sockets"
+	"github.com/nch-bowstave/paymail/config"
+	"github.com/nch-bowstave/paymail/data"
+	"github.com/nch-bowstave/paymail/data/payd"
+	"github.com/nch-bowstave/paymail/data/sockets"
+	"github.com/nch-bowstave/paymail/docs"
+	"github.com/nch-bowstave/paymail/log"
+	"github.com/nch-bowstave/paymail/service"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/spf13/viper"
@@ -25,14 +27,13 @@ import (
 	"github.com/theflyingcodr/sockets/server"
 
 	"github.com/libsv/go-p4"
-	"github.com/libsv/p4-server/config"
 	"github.com/libsv/p4-server/data/noop"
 	socData "github.com/libsv/p4-server/data/sockets"
-	"github.com/libsv/p4-server/service"
 )
 
 // Deps holds all the dependencies.
 type Deps struct {
+	PaymailService        service.Paymail
 	PaymentService        p4.PaymentService
 	PaymentRequestService p4.PaymentRequestService
 	ProofsService         p4.ProofsService
@@ -52,6 +53,7 @@ func SetupDeps(cfg config.Config, l log.Logger) *Deps {
 	paydStore := payd.NewPayD(cfg.PayD, data.NewClient(httpClient))
 
 	// services
+	paymailSvc := service.NewPaymail(l)
 	paymentSvc := service.NewPayment(l, paydStore)
 	paymentReqSvc := service.NewPaymentRequest(cfg.Server, paydStore, paydStore)
 	if cfg.PayD.Noop {
@@ -62,6 +64,7 @@ func SetupDeps(cfg config.Config, l log.Logger) *Deps {
 	proofService := service.NewProof(paydStore)
 
 	return &Deps{
+		PaymailService:        paymailSvc,
 		PaymentService:        paymentSvc,
 		PaymentRequestService: paymentReqSvc,
 		ProofsService:         proofService,
@@ -95,9 +98,10 @@ func SetupSwagger(cfg config.Server, e *echo.Echo) {
 func SetupHTTPEndpoints(deps *Deps, e *echo.Echo) {
 	g := e.Group("/")
 	// handlers
-	p4Handlers.NewPaymentHandler(deps.PaymentService).RegisterRoutes(g)
-	p4Handlers.NewPaymentRequestHandler(deps.PaymentRequestService).RegisterRoutes(g)
-	p4Handlers.NewProofs(deps.ProofsService).RegisterRoutes(g)
+
+	// p4Handlers.NewPaymentHandler(deps.PaymentService).RegisterRoutes(g)
+	// p4Handlers.NewPaymentRequestHandler(deps.PaymentRequestService).RegisterRoutes(g)
+	// p4Handlers.NewProofs(deps.ProofsService).RegisterRoutes(g)
 }
 
 // SetupSockets will setup handlers and socket server.

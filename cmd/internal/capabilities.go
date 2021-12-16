@@ -76,7 +76,7 @@ func GenerateCapabilitiesDocument() {
 	if err != nil {
 		panic(err)
 	}
-	err = data.CapabilitiesData.OverwriteFile("capabilities.json", d)
+	err = data.OverwriteStaticCapabilitiesFile(d)
 	if err != nil {
 		panic(err)
 	}
