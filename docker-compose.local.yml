@@ -1,5 +1,15 @@
-version: '3.7'
+version: "3.7"
 
 services:
-  paymail:
-    image: paymail.service
+  p4:
+    container_name: p4
+    image: local.p4
+    environment:
+      SOCKET_CHANNEL_TIMEOUTSECONDS: 120
+
+  p4-merchant:
+    container_name: p4-merchant
+    image: local.p4
+    environment:
+      SOCKET_CHANNEL_TIMEOUTSECONDS: 120
+

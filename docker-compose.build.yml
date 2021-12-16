@@ -1,7 +1,7 @@
 version: "3.7"
 
 services:
-  paymail:
-    image: paymail.service
+  p4:
+    image: local.p4
     build:
       context: .

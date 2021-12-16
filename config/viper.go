@@ -2,39 +2,39 @@ package config
 
 import (
 	"strings"
-	"time"
 
 	"github.com/spf13/viper"
 )
 
+// ViperConfig contains viper based configuration data.
+type ViperConfig struct {
+	*Config
+}
+
 // NewViperConfig will setup and return a new viper based configuration handler.
-func NewViperConfig(appname string) *Config {
+func NewViperConfig(appname string) *ViperConfig {
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	return &Config{}
+	return &ViperConfig{
+		Config: &Config{},
+	}
 }
 
 // WithServer will setup the web server configuration if required.
-func (c *Config) WithServer() *Config {
-	viper.SetDefault(EnvServerPort, ":4000")
-	viper.SetDefault(EnvServerHost, "localhost:4000")
-	viper.SetDefault(EnvServerDomain, "localhost:4000")
-	c.Server = &Server{
-		Port:     viper.GetString(EnvServerPort),
-		Hostname: viper.GetString(EnvServerHost),
+func (v *ViperConfig) WithServer() ConfigurationLoader {
+	v.Server = &Server{
+		Port:           viper.GetString(EnvServerPort),
+		Hostname:       viper.GetString(EnvServerHost),
+		SwaggerEnabled: viper.GetBool(EnvServerSwaggerEnabled),
+		SwaggerHost:    viper.GetString(EnvServerSwaggerHost),
+		FQDN:           viper.GetString(EnvServerFQDN),
 	}
-	return c
+	return v
 }
 
 // WithDeployment sets up the deployment configuration if required.
-func (c *Config) WithDeployment(appName string) *Config {
-	viper.SetDefault(EnvEnvironment, "dev")
-	viper.SetDefault(EnvRegion, "test")
-	viper.SetDefault(EnvCommit, "test")
-	viper.SetDefault(EnvVersion, "test")
-	viper.SetDefault(EnvBuildDate, time.Now().UTC())
-
-	c.Deployment = &Deployment{
+func (v *ViperConfig) WithDeployment(appName string) ConfigurationLoader {
+	v.Deployment = &Deployment{
 		Environment: viper.GetString(EnvEnvironment),
 		Region:      viper.GetString(EnvRegion),
 		Version:     viper.GetString(EnvVersion),
@@ -42,40 +42,45 @@ func (c *Config) WithDeployment(appName string) *Config {
 		BuildDate:   viper.GetTime(EnvBuildDate),
 		AppName:     appName,
 	}
-	return c
+	return v
 }
 
 // WithLog sets up and returns log config.
-func (c *Config) WithLog() *Config {
-	viper.SetDefault(EnvLogLevel, "info")
-	c.Logging = &Logging{Level: viper.GetString(EnvLogLevel)}
-	return c
+func (v *ViperConfig) WithLog() ConfigurationLoader {
+	v.Logging = &Logging{Level: viper.GetString(EnvLogLevel)}
+	return v
 }
 
-// WithDb sets up and returns database configuration.
-func (c *Config) WithDb() *Config {
-	viper.SetDefault(EnvDb, "postgres")
-	viper.SetDefault(EnvDbDsn, "user=ps password=root dbname=paymail host=localhost sslmode=disable port=5432")
-	viper.SetDefault(EnvDbSchema, "data/sql/migrations")
-	viper.SetDefault(EnvDbMigrate, false)
-	c.Db = &Db{
-		Type:       DbType(viper.GetString(EnvDb)),
-		Dsn:        viper.GetString(EnvDbDsn),
-		SchemaPath: viper.GetString(EnvDbSchema),
-		MigrateDb:  viper.GetBool(EnvDbMigrate),
+// WithPayD sets up and returns PayD viper config.
+func (v *ViperConfig) WithPayD() ConfigurationLoader {
+	v.PayD = &PayD{
+		Host:            viper.GetString(EnvPaydHost),
+		Port:            viper.GetString(EnvPaydPort),
+		Secure:          viper.GetBool(EnvPaydSecure),
+		CertificatePath: viper.GetString(EnvPaydCertPath),
+		Noop:            viper.GetBool(EnvPaydNoop),
 	}
-	return c
+	return v
 }
 
-// WithCapability sets up the capbability for current instance of paymail.
-func (c *Config) WithCapability() *Config {
-	domain := viper.GetString(EnvServerDomain)
-	viper.SetDefault(EnvBSVAliasVersion, "1.0")
-
-	c.Paymail = &Paymail{
-		Domain:  domain,
-		Version: viper.GetString(EnvBSVAliasVersion),
+// WithSockets reads socket env vars.
+func (v *ViperConfig) WithSockets() ConfigurationLoader {
+	v.Sockets = &Socket{
+		ChannelTimeout:  viper.GetDuration(EnvSocketChannelTimeoutSeconds),
+		MaxMessageBytes: viper.GetInt(EnvSocketMaxMessageBytes),
 	}
+	return v
+}
 
-	return c
+// WithTransports reads transport config.
+func (v *ViperConfig) WithTransports() ConfigurationLoader {
+	v.Transports = &Transports{
+		Mode: viper.GetString(EnvTransportMode),
+	}
+	return v
+}
+
+// Load will return the underlying config setup.
+func (v *ViperConfig) Load() *Config {
+	return v.Config
 }

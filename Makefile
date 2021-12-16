@@ -1,11 +1,18 @@
 SHELL=/bin/bash
 
-run-server:
-	@go run -race cmd/http-server/main.go
+help:
+	@egrep -h '^(.+)\:\ ##\ (.+)' ${MAKEFILE_LIST} | column -t -c 2 -s ':#'
+
+run-service:
+	@go run -race cmd/bip270-server/main.go server
 
 run-all-tests: run-linter run-unit-tests
 
 pre-commit: vendor-deps run-all-tests
+
+restart: stop-compose run-compose-d
+
+redeploy: stop-compose build-image run-compose-d
 
 run-unit-tests:
 	@go clean -testcache && go test -v ./... -race
@@ -19,7 +26,8 @@ run-unit-tests-cover:
 	open file:///$(shell pwd)/cover.html
 
 run-linter:
-	@golangci-lint run --deadline=240s --skip-dirs=vendor --tests
+	@golangci-lint run --deadline=480s --skip-dirs=vendor --tests
+
 
 install-linter:
 	@curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.35.2
@@ -33,16 +41,31 @@ go-doc-linux:
 	godoc -http=:6060
 
 run-compose:
-	@docker-compose up
+	@docker-compose -f docker-compose.yml -f docker-compose.build.yml  up
 
 run-compose-d:
-	@docker-compose up -d
+	@docker-compose -f docker-compose.yml -f docker-compose.build.yml  up -d
 
-fresh-compose:
-	@docker-compose down && docker-compose build && docker-compose up
+run-compose-dev:
+	@docker-compose -f docker-compose.yml  -f docker-compose.dev.yml up
+
+run-compose-local:
+	@docker-compose -f docker-compose.yml  -f docker-compose.local.yml up
+
+build-image:
+	@docker-compose -f docker-compose.yml -f docker-compose.build.yml build
+
+run-compose-dev-d:
+	@docker-compose -f docker-compose.yml -f docker-compose.build.yml -f docker-compose.dev.yml up -d
 
 stop-compose:
 	@docker-compose down
 
 vendor-deps:
 	@go mod tidy && go mod vendor
+
+install-swagger-gen:
+	@go get github.com/swaggo/swag/cmd/swag
+
+generate-swagger:
+	@swag init --parseVendor --parseDependency --parseInternal -g ./cmd/server/main.go
