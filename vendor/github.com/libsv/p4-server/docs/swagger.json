@@ -1,0 +1,463 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Payment Protocol Server is an implementation of a Bip-270 payment flow.",
+        "title": "Payment Protocol Server",
+        "termsOfService": "https://github.com/libsv/go-payment_protocol/blob/master/CODE_STANDARDS.md",
+        "contact": {},
+        "license": {
+            "name": "ISC",
+            "url": "https://github.com/libsv/go-payment_protocol/blob/master/LICENSE"
+        },
+        "version": "0.0.1"
+    },
+    "host": "localhost:8445",
+    "paths": {
+        "/api/v1/payment/{paymentID}": {
+            "get": {
+                "description": "Creates a payment request based on a payment id (the identifier for an invoice).",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payment"
+                ],
+                "summary": "Request to pay an invoice and receive back outputs to use when constructing the payment transaction",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Payment ID",
+                        "name": "paymentID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "contains outputs, merchant data and expiry information, used by the payee to construct a transaction",
+                        "schema": {
+                            "$ref": "#/definitions/p4.PaymentRequest"
+                        }
+                    },
+                    "400": {
+                        "description": "returned if the user input is invalid, usually an issue with the paymentID",
+                        "schema": {
+                            "$ref": "#/definitions/p4.ClientError"
+                        }
+                    },
+                    "404": {
+                        "description": "returned if the paymentID has not been found",
+                        "schema": {
+                            "$ref": "#/definitions/p4.ClientError"
+                        }
+                    },
+                    "500": {
+                        "description": "returned if there is an unexpected internal error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a payment based on a payment id (the identifier for an invoice).",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payment"
+                ],
+                "summary": "A user will submit an SpvEnvelope along with other information that is validated before being broadcast to the network.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Payment ID",
+                        "name": "paymentID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "payment message used in BIP270",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/p4.PaymentCreate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "if success, error code will be empty, otherwise it will be filled in with reason",
+                        "schema": {
+                            "$ref": "#/definitions/p4.PaymentACK"
+                        }
+                    },
+                    "400": {
+                        "description": "returned if the user input is invalid, usually an issue with the paymentID",
+                        "schema": {
+                            "$ref": "#/definitions/p4.ClientError"
+                        }
+                    },
+                    "404": {
+                        "description": "returned if the paymentID has not been found",
+                        "schema": {
+                            "$ref": "#/definitions/p4.ClientError"
+                        }
+                    },
+                    "500": {
+                        "description": "returned if there is an unexpected internal error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/proofs/{txid}": {
+            "post": {
+                "description": "Creates a json envelope proof",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Proofs"
+                ],
+                "summary": "InvoiceCreate proof",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Transaction ID",
+                        "name": "txid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "JSON Envelope",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/envelope.JSONEnvelope"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": ""
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "bc.MapiCallback": {
+            "type": "object",
+            "properties": {
+                "apiVersion": {
+                    "type": "string"
+                },
+                "blockHash": {
+                    "type": "string"
+                },
+                "blockHeight": {
+                    "type": "integer"
+                },
+                "callbackPayload": {
+                    "type": "string"
+                },
+                "callbackReason": {
+                    "type": "string"
+                },
+                "callbackTxId": {
+                    "type": "string"
+                },
+                "minerId": {
+                    "type": "string"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "bc.MerkleProof": {
+            "type": "object",
+            "properties": {
+                "composite": {
+                    "type": "boolean"
+                },
+                "index": {
+                    "type": "integer"
+                },
+                "nodes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "proofType": {
+                    "type": "string"
+                },
+                "target": {
+                    "type": "string"
+                },
+                "targetType": {
+                    "type": "string"
+                },
+                "txOrId": {
+                    "type": "string"
+                }
+            }
+        },
+        "bt.FeeQuote": {
+            "type": "object"
+        },
+        "envelope.JSONEnvelope": {
+            "type": "object",
+            "properties": {
+                "encoding": {
+                    "type": "string"
+                },
+                "mimetype": {
+                    "type": "string"
+                },
+                "payload": {
+                    "type": "string"
+                },
+                "publicKey": {
+                    "type": "string"
+                },
+                "signature": {
+                    "type": "string"
+                }
+            }
+        },
+        "p4.ClientError": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "example": "N01"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "e97970bf-2a88-4bc8-90e6-2f597a80b93d"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "unable to find foo when loading bar"
+                },
+                "title": {
+                    "type": "string",
+                    "example": "not found"
+                }
+            }
+        },
+        "p4.MerchantData": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "description": "Address is the merchants store / head office address.",
+                    "type": "string",
+                    "example": "1 the street, the town, B1 1AA"
+                },
+                "avatar": {
+                    "description": "AvatarURL displays a canonical url to a merchants avatar.",
+                    "type": "string",
+                    "example": "http://url.com"
+                },
+                "email": {
+                    "description": "Email can be sued to contact the merchant about this transaction.",
+                    "type": "string",
+                    "example": "merchant@m.com"
+                },
+                "extendedData": {
+                    "description": "ExtendedData can be supplied if the merchant wishes to send some arbitrary data back to the wallet.",
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "name": {
+                    "description": "MerchantName is a human readable string identifying the merchant.",
+                    "type": "string",
+                    "example": "merchant 1"
+                }
+            }
+        },
+        "p4.Output": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "description": "Amount is the number of satoshis to be paid.",
+                    "type": "integer",
+                    "example": 100000
+                },
+                "description": {
+                    "description": "Description, an optional description such as \"tip\" or \"sales tax\". Maximum length is 100 chars.",
+                    "type": "string",
+                    "example": "paymentReference 123456"
+                },
+                "script": {
+                    "description": "Script is a locking script where payment should be sent, formatted as a hexadecimal string.",
+                    "type": "string",
+                    "example": "76a91455b61be43392125d127f1780fb038437cd67ef9c88ac"
+                }
+            }
+        },
+        "p4.PaymentACK": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "description": "A number indicating why the transaction was not accepted. 0 or undefined indicates no error.\nA 1 or any other positive integer indicates an error. The errors are left undefined for now;\nit is recommended only to use “1” and to fill the memo with a textual explanation about why\nthe transaction was not accepted until further numbers are defined and standardised.",
+                    "type": "integer"
+                },
+                "memo": {
+                    "type": "string"
+                },
+                "payment": {
+                    "$ref": "#/definitions/p4.PaymentCreate"
+                }
+            }
+        },
+        "p4.PaymentCreate": {
+            "type": "object",
+            "properties": {
+                "memo": {
+                    "description": "Memo is a plain-text note from the customer to the payment host.",
+                    "type": "string",
+                    "example": "for invoice 123456"
+                },
+                "merchantData": {
+                    "description": "MerchantData is copied from PaymentDetails.merchantData.\nPayment hosts may use invoice numbers or any other data they require to match Payments to PaymentRequests.\nNote that malicious clients may modify the merchantData, so should be authenticated\nin some way (for example, signed with a payment host-only key).\nMaximum length is 10000 characters.",
+                    "$ref": "#/definitions/p4.MerchantData"
+                },
+                "proofCallbacks": {
+                    "description": "ProofCallbacks are optional and can be supplied when the sender wants to receive\na merkleproof for the transaction they are submitting as part of the SPV Envelope.\n\nThis is especially useful if they are receiving change and means when they use it\nas an input, they can provide the merkle proof.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/p4.ProofCallback"
+                    }
+                },
+                "rawTx": {
+                    "description": "RawTX should be sent if SPVRequired is set to false in the payment request.",
+                    "type": "string"
+                },
+                "refundTo": {
+                    "description": "RefundTo is a paymail to send a refund to should a refund be necessary.\nMaximum length is 100 characters",
+                    "type": "string",
+                    "example": "me@paymail.com"
+                },
+                "spvEnvelope": {
+                    "description": "SPVEnvelope which contains the details of previous transaction and Merkle proof of each input UTXO.\nShould be available if SPVRequired is set to true in the paymentRequest.\nSee https://tsc.bitcoinassociation.net/standards/spv-envelope/",
+                    "$ref": "#/definitions/spv.Envelope"
+                }
+            }
+        },
+        "p4.PaymentDestinations": {
+            "type": "object",
+            "properties": {
+                "outputs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/p4.Output"
+                    }
+                }
+            }
+        },
+        "p4.PaymentRequest": {
+            "type": "object",
+            "properties": {
+                "creationTimestamp": {
+                    "description": "CreationTimestamp Unix timestamp (seconds since 1-Jan-1970 UTC) when the PaymentRequest was created.\nRequired.",
+                    "type": "string",
+                    "example": "2019-10-12T07:20:50.52Z"
+                },
+                "destinations": {
+                    "description": "Destinations contains supported payment destinations by the merchant and p4 server, initial P2PKH outputs but can be extended.\nRequired.",
+                    "$ref": "#/definitions/p4.PaymentDestinations"
+                },
+                "expirationTimestamp": {
+                    "description": "ExpirationTimestamp Unix timestamp (UTC) after which the PaymentRequest should be considered invalid.\nOptional.",
+                    "type": "string",
+                    "example": "2019-10-12T07:20:50.52Z"
+                },
+                "fees": {
+                    "description": "FeeRate defines the amount of fees a users wallet should add to the payment\nwhen submitting their final payments.",
+                    "$ref": "#/definitions/bt.FeeQuote"
+                },
+                "memo": {
+                    "description": "Memo Optional note that should be displayed to the customer, explaining what this PaymentRequest is for.\nMaximum length is 50 characters.",
+                    "type": "string",
+                    "example": "invoice number 123456"
+                },
+                "merchantData": {
+                    "description": "MerchantData contains arbitrary data that may be used by the payment host to identify the PaymentRequest.\nMay be omitted if the payment host does not need to associate Payments with PaymentRequest\nor if they associate each PaymentRequest with a separate payment address.\nMaximum length is 10000 characters.",
+                    "$ref": "#/definitions/p4.MerchantData"
+                },
+                "network": {
+                    "description": "Network  Always set to \"bitcoin\" (but seems to be set to 'bitcoin-sv'\noutside bip270 spec, see https://handcash.github.io/handcash-merchant-integration/#/merchant-payments)\n{enum: bitcoin, bitcoin-sv, test}\nRequired.",
+                    "type": "string",
+                    "enum": [
+                        "mainnet",
+                        "testnet",
+                        "stn",
+                        "regtest"
+                    ],
+                    "example": "mainnet"
+                },
+                "paymentUrl": {
+                    "description": "PaymentURL secure HTTPS location where a Payment message (see below) will be sent to obtain a PaymentACK.\nMaximum length is 4000 characters",
+                    "type": "string",
+                    "example": "https://localhost:3443/api/v1/payment/123456"
+                },
+                "spvRequired": {
+                    "description": "SPVRequired if true will expect the sender to submit an SPVEnvelope in the payment request, otherwise\na rawTx will be required.",
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "p4.ProofCallback": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "spv.Envelope": {
+            "type": "object",
+            "properties": {
+                "mapiResponses": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/bc.MapiCallback"
+                    }
+                },
+                "parents": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/spv.Envelope"
+                    }
+                },
+                "proof": {
+                    "$ref": "#/definitions/bc.MerkleProof"
+                },
+                "rawTx": {
+                    "type": "string"
+                },
+                "txid": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

@@ -1,4 +1,4 @@
-package paymail
+package internal
 
 import (
 	"testing"

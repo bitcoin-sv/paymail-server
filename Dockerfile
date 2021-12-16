@@ -25,6 +25,6 @@ COPY --from=builder /etc/group /etc/group
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 USER appuser:appuser
 
-EXPOSE 8445
+EXPOSE 8446
 
 CMD ["server"]

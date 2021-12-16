@@ -6,9 +6,9 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/libsv/p4-server/cmd/internal"
-	"github.com/libsv/p4-server/config"
-	"github.com/libsv/p4-server/log"
+	"github.com/nch-bowstave/paymail/cmd/internal"
+	"github.com/nch-bowstave/paymail/config"
+	"github.com/nch-bowstave/paymail/log"
 )
 
 const appname = "payment-protocol-rest-server"
@@ -63,19 +63,12 @@ func main() {
 		internal.SetupSwagger(*cfg.Server, e)
 	}
 
+	// generate a static capabilities document based on the files in data/capabilities.
+	internal.GenerateCapabilitiesDocument()
+
 	// setup transports
-	switch cfg.Transports.Mode {
-	case config.TransportModeHTTP:
-		internal.SetupHTTPEndpoints(internal.SetupDeps(*cfg, log), e)
-	case config.TransportModeSocket:
-		s := internal.SetupSockets(*cfg.Sockets, e)
-		internal.SetupSocketMetrics(s)
-		defer s.Close()
-	case config.TransportModeHybrid:
-		s := internal.SetupHybrid(*cfg, log, e)
-		internal.SetupSocketMetrics(s)
-		defer s.Close()
-	}
+	internal.SetupHTTPEndpoints(internal.SetupDeps(*cfg, log), e)
+
 	if cfg.Deployment.IsDev() {
 		internal.PrintDev(e)
 	}

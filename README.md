@@ -7,28 +7,29 @@
 [![Sponsor](https://img.shields.io/badge/sponsor-libsv-181717.svg?logo=github&style=flat&v=3)](https://github.com/sponsors/libsv)
 [![Donate](https://img.shields.io/badge/donate-bitcoin-ff9900.svg?logo=bitcoin&style=flat&v=3)](https://gobitcoinsv.com/#sponsor)
 
-P4 is a basic reference implementation of a Payment Protocol Server implementing the proposed BIP-270 payment flow.
+Paymail Server is a basic reference implementation of the Paymail Standard service discovery protocol.
 
 This is written in go and integrates with a wallet running the Payment Protocol PayD Interface.
 
 ## Exploring Endpoints
 
-To explore the endpoints and functionality, run the server using `go run cmd/rest-server/main.go` and navigate to [Swagger](http://localhost:8445/swagger/index.html) 
+To explore the endpoints and functionality, run the server using `go run cmd/rest-server/main.go` and navigate to [Swagger](http://localhost:8446/swagger/index.html) 
 where the endpoints and their models are described in detail.
 
-## Configuring P4
+## Configuring Paymail
 
 The server has a series of environment variables that allow you to configure the behaviours and integrations of the server.
 Values can also be passed at build time to provide information such as build information, region, version etc.
 
 ### Server
 
-| Key                    | Description                                                        | Default        |
-|------------------------|--------------------------------------------------------------------|----------------|
-| SERVER_PORT            | Port which this server should use                                  | :8445          |
-| SERVER_HOST            | Host name under which this server is found                         | p4             |
-| SERVER_SWAGGER_ENABLED | If set to true we will expose an endpoint hosting the Swagger docs | true           |
-| SERVER_SWAGGER_HOST    | Sets the base url for swagger ui calls                             | localhost:8445 |
+| Key                    | Description                                                           | Default        |
+|------------------------|-----------------------------------------------------------------------|----------------|
+| DOMAIN_TLD             | Domain name and top level domain on which this paymail service runs   | nchain.com     |
+| SERVER_PORT            | Port which this server should use                                     | :8446          |
+| SERVER_HOST            | Host name under which this server is found                            | paymail        |
+| SERVER_SWAGGER_ENABLED | If set to true we will expose an endpoint hosting the Swagger docs    | true           |
+| SERVER_SWAGGER_HOST    | Sets the base url for swagger ui calls                                | localhost:8446 |
 
 ### Environment / Deployment Info
 
@@ -56,7 +57,7 @@ Values can also be passed at build time to provide information such as build inf
 | PAYD_SECURE | If true the P4 server will validate the wallet TLS certs | false   |
 | PAYD_NOOP   | If true we will use a dummy data store in place of payd  | true    |
 
-## Working with P4
+## Working with Paymail Server
 
 There are a set of makefile commands listed under the [Makefile](Makefile) which give some useful shortcuts when working
 with the repo.
@@ -65,9 +66,9 @@ Some of the more common commands are listed below:
 
 `make pre-commit` - ensures dependencies are up to date and runs linter and unit tests.
 
-`make build-image` - builds a local docker image, useful when testing p4 in docker.
+`make build-image` - builds a local docker image, useful when testing paymail-server in docker.
 
-`make run-compose` - runs P4 in compose, a reference PayD wallet will be added to compose soon NOTE the above command will need ran first.
+`make run-compose` - runs Paymail Server in compose, a reference PayD wallet will be added to compose soon NOTE the above command will need ran first.
 
 ### Rebuild on code change
 

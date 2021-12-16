@@ -1,6 +1,6 @@
 # Architecture
 
-P4 uses a standard 3 layer architecture with clear separation between these layers of the application:
+paymail-server uses a standard 3 layer architecture with clear separation between these layers of the application:
 
 ![3 Tier Layout](https://aspblogs.blob.core.windows.net/media/fredriknormen/WindowsLiveWriter/UsingWebServicesina3tierarchitecture_134F6/3tier_thumb.jpg "3 tier layout")
 

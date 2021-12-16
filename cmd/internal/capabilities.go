@@ -1,12 +1,12 @@
-package paymail
+package internal
 
 import (
 	"encoding/hex"
 	"encoding/json"
 	"strings"
 
-	"github.com/libsv/go-bt"
-	"github.com/libsv/go-bt/crypto"
+	"github.com/libsv/go-bk/crypto"
+	"github.com/libsv/go-bt/v2"
 	"github.com/nch-bowstave/paymail/data"
 	"gopkg.in/yaml.v2"
 )
@@ -60,25 +60,24 @@ func GenerateBrfcID(c *Capability) string {
 	return hex.EncodeToString(bt.ReverseBytes(crypto.Sha256d(cat)[26:]))
 }
 
-func GenerateCapabilitiesDocument() error {
+func GenerateCapabilitiesDocument() {
 	var capabilities CapabilitiesDocument
 	files, err := data.CapabilitiesData.LoadAll()
 	if err != nil {
-		return err
+		panic(err)
 	}
 	for _, data := range files {
 		err = capabilities.AddCapability(data)
 		if err != nil {
-			return err
+			panic(err)
 		}
 	}
 	d, err := json.Marshal(capabilities)
 	if err != nil {
-		return err
+		panic(err)
 	}
 	err = data.CapabilitiesData.OverwriteFile("capabilities.json", d)
 	if err != nil {
-		return err
+		panic(err)
 	}
-	return nil
 }

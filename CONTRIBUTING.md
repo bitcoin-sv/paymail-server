@@ -1,4 +1,4 @@
-## How to contribute to payd
+## How to contribute to paymail-server
 
 #### **Did you find a bug?**
 
