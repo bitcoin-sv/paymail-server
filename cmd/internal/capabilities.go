@@ -80,6 +80,5 @@ func GenerateCapabilitiesDocument() {
 	err = data.OverwriteStaticCapabilitiesFile(d)
 	if err != nil {
 		fmt.Println(err)
-		panic(err)
 	}
 }

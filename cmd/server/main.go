@@ -63,9 +63,6 @@ func main() {
 		internal.SetupSwagger(*cfg.Server, e)
 	}
 
-	// generate a static capabilities document based on the files in data/capabilities.
-	internal.GenerateCapabilitiesDocument()
-
 	// setup transports
 	internal.SetupHTTPEndpoints(internal.SetupDeps(*cfg, log), e)
 
