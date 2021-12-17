@@ -8,8 +8,8 @@ import (
 
 	"github.com/libsv/go-p4"
 	p4mocks "github.com/libsv/go-p4/mocks"
-	"github.com/libsv/p4-server/config"
 	"github.com/libsv/p4-server/service"
+	"github.com/nch-bowstave/paymail/config"
 	"github.com/stretchr/testify/assert"
 )
 

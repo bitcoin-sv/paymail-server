@@ -14,7 +14,7 @@ type Directory struct {
 	fs     embed.FS
 }
 
-//go:embed capabilities/*
+//go:embed *
 var capabilityData embed.FS
 
 // CapabilitiesData data for creating spv envelopes.
@@ -42,7 +42,7 @@ func (d *Directory) LoadAll() ([][]byte, error) {
 
 // LoadStaticDocument will return the generated document if it exists.
 func (d *Directory) LoadStaticDocument() ([]byte, error) {
-	data, err := d.fs.ReadFile(d.prefix + "/capabilities.json")
+	data, err := d.fs.ReadFile("capabilities.json")
 	if err != nil {
 		return nil, errors.Wrap(err, "you have to run the setup to generate the static capabilities.json")
 	}
@@ -50,9 +50,9 @@ func (d *Directory) LoadStaticDocument() ([]byte, error) {
 }
 
 // OverwriteStaticCapabilitiesFile is self explanitory, however the important note is that this filepath is relative.
-// The capabilities_test.go and main.go must remain in the same order of nested folders otherwise this filepath will fail.
+// Run server must be done from root directory of the package for this reason.
 func OverwriteStaticCapabilitiesFile(data []byte) error {
-	path := "../../data/capabilities/capabilities.json"
+	path := "data/capabilities.json"
 	_ = os.Remove(path)
 	return os.WriteFile(path, data, 0600)
 }

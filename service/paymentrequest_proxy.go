@@ -6,7 +6,7 @@ import (
 	"net/url"
 
 	"github.com/libsv/go-p4"
-	"github.com/libsv/p4-server/config"
+	"github.com/nch-bowstave/paymail/config"
 	"github.com/pkg/errors"
 	validator "github.com/theflyingcodr/govalidator"
 )

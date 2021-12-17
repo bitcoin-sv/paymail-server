@@ -9,8 +9,6 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	p4Handlers "github.com/libsv/p4-server/transports/http"
-	p4Middleware "github.com/libsv/p4-server/transports/http/middleware"
 	p4soc "github.com/libsv/p4-server/transports/sockets"
 	"github.com/nch-bowstave/paymail/config"
 	"github.com/nch-bowstave/paymail/data"
@@ -19,6 +17,8 @@ import (
 	"github.com/nch-bowstave/paymail/docs"
 	"github.com/nch-bowstave/paymail/log"
 	"github.com/nch-bowstave/paymail/service"
+	paymailHandlers "github.com/nch-bowstave/paymail/transports/http"
+	paymailMiddleware "github.com/nch-bowstave/paymail/transports/http/middleware"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/spf13/viper"
@@ -84,7 +84,7 @@ func SetupEcho(l log.Logger) *echo.Echo {
 		AllowOrigins: []string{"*"},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
 	}))
-	e.HTTPErrorHandler = p4Middleware.ErrorHandler(l)
+	e.HTTPErrorHandler = paymailMiddleware.ErrorHandler(l)
 	return e
 }
 
@@ -99,9 +99,11 @@ func SetupHTTPEndpoints(deps *Deps, e *echo.Echo) {
 	g := e.Group("/")
 	// handlers
 
-	// p4Handlers.NewPaymentHandler(deps.PaymentService).RegisterRoutes(g)
-	// p4Handlers.NewPaymentRequestHandler(deps.PaymentRequestService).RegisterRoutes(g)
-	// p4Handlers.NewProofs(deps.ProofsService).RegisterRoutes(g)
+	paymailHandlers.NewCapabilitiesHandler(deps.PaymailService).RegisterRoutes(g)
+
+	// paymailHandlers.NewPaymentHandler(deps.PaymentService).RegisterRoutes(g)
+	// paymailHandlers.NewPaymentRequestHandler(deps.PaymentRequestService).RegisterRoutes(g)
+	// paymailHandlers.NewProofs(deps.ProofsService).RegisterRoutes(g)
 }
 
 // SetupSockets will setup handlers and socket server.
@@ -117,7 +119,7 @@ func SetupSockets(cfg config.Socket, e *echo.Echo) *server.SocketServer {
 
 	p4soc.NewPaymentRequest().Register(s)
 	p4soc.NewPayment().Register(s)
-	p4Handlers.NewProofs(service.NewProof(sockets.NewPayd(s))).RegisterRoutes(g)
+	paymailHandlers.NewProofs(service.NewProof(sockets.NewPayd(s))).RegisterRoutes(g)
 
 	// this is our websocket endpoint, clients will hit this with the channelID they wish to connect to
 	e.GET("/ws/:channelID", wsHandler(s))
@@ -139,9 +141,9 @@ func SetupHybrid(cfg config.Config, l log.Logger, e *echo.Echo) *server.SocketSe
 	paymentReqSvc := service.NewPaymentRequestProxy(paymentStore, cfg.Transports, cfg.Server)
 	proofsSvc := service.NewProof(paymentStore)
 
-	p4Handlers.NewPaymentHandler(paymentSvc).RegisterRoutes(g)
-	p4Handlers.NewPaymentRequestHandler(paymentReqSvc).RegisterRoutes(g)
-	p4Handlers.NewProofs(proofsSvc).RegisterRoutes(g)
+	paymailHandlers.NewPaymentHandler(paymentSvc).RegisterRoutes(g)
+	paymailHandlers.NewPaymentRequestHandler(paymentReqSvc).RegisterRoutes(g)
+	paymailHandlers.NewProofs(proofsSvc).RegisterRoutes(g)
 	p4soc.NewHealthHandler().Register(s)
 
 	e.GET("/ws/:channelID", wsHandler(s))

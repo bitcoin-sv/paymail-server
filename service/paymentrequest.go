@@ -8,7 +8,7 @@ import (
 	validator "github.com/theflyingcodr/govalidator"
 
 	"github.com/libsv/go-p4"
-	"github.com/libsv/p4-server/config"
+	"github.com/nch-bowstave/paymail/config"
 )
 
 type paymentRequest struct {

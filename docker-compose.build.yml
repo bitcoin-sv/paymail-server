@@ -13,7 +13,7 @@ services:
       LOG_LEVEL: "info"
       PAYD_HOST: "payd"
       PAYD_PORT: ":8443"
-      TRANSPORT_MODE: "http"
+      TRANSPORT_MODE: "rest"
     ports:
       - "8446:8446"
     networks:

@@ -3,6 +3,7 @@ package internal
 import (
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"strings"
 
 	"github.com/libsv/go-bk/crypto"
@@ -78,6 +79,7 @@ func GenerateCapabilitiesDocument() {
 	}
 	err = data.OverwriteStaticCapabilitiesFile(d)
 	if err != nil {
+		fmt.Println(err)
 		panic(err)
 	}
 }
