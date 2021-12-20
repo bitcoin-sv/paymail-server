@@ -4,4 +4,5 @@ authors:
   - Jad (nChain)
   - Deggen (nChain)
 version: 1.0
-callback: /peer/{alias}@{domain.tld}
+callback: /api/peer/{alias}@{domain.tld}
+readme: https://libsv.github.io/

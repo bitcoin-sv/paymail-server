@@ -5,4 +5,5 @@ authors:
   - Ivan Mlinaric (Handcash)
   - Rafa (Handcash)
 version: 1.1
-callback: /p2pRawTx/{alias}@{domain.tld}
+callback: /api/p2pRawTx/{alias}@{domain.tld}
+readme: https://libsv.github.io/

@@ -8,7 +8,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-// capabilitiesHandler is an http handler that supports BIP-270 requests.
+// capabilitiesHandler is the capabilities discovery document request handler.
 type capabilitiesHandler struct {
 	svc service.Paymail
 }

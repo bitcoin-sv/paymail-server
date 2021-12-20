@@ -21,7 +21,8 @@ func NewPaymail(l log.Logger) *paymail {
 
 // Paymail contains the handlers for paymail service endpoints.
 type Paymail interface {
-	Capabilities(context.Context) (*CapabilitiesDocument, error)
+	Capabilities(ctx context.Context) (*CapabilitiesDocument, error)
+	// PKI(ctx context.Context, args Handle) (*Pki, error)
 	// P2pDest(ctx context.Context, args ) (*PaymentDestination, error)
 	// P2pRawTx(ctx context.Context, handle Handle, args SenderRequest) (*PaymentOutput, error)
 }

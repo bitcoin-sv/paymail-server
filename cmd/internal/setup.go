@@ -34,6 +34,7 @@ import (
 // Deps holds all the dependencies.
 type Deps struct {
 	PaymailService        service.Paymail
+	PkiService            service.Pki
 	PaymentService        p4.PaymentService
 	PaymentRequestService p4.PaymentRequestService
 	ProofsService         p4.ProofsService
@@ -54,6 +55,7 @@ func SetupDeps(cfg config.Config, l log.Logger) *Deps {
 
 	// services
 	paymailSvc := service.NewPaymail(l)
+	pkiSvc := service.NewPki(l)
 	paymentSvc := service.NewPayment(l, paydStore)
 	paymentReqSvc := service.NewPaymentRequest(cfg.Server, paydStore, paydStore)
 	if cfg.PayD.Noop {
@@ -65,6 +67,7 @@ func SetupDeps(cfg config.Config, l log.Logger) *Deps {
 
 	return &Deps{
 		PaymailService:        paymailSvc,
+		PkiService:            pkiSvc,
 		PaymentService:        paymentSvc,
 		PaymentRequestService: paymentReqSvc,
 		ProofsService:         proofService,
@@ -100,6 +103,7 @@ func SetupHTTPEndpoints(deps *Deps, e *echo.Echo) {
 	// handlers
 
 	paymailHandlers.NewCapabilitiesHandler(deps.PaymailService).RegisterRoutes(g)
+	paymailHandlers.NewPkiHandler(deps.PkiService).RegisterRoutes(g)
 
 	// paymailHandlers.NewPaymentHandler(deps.PaymentService).RegisterRoutes(g)
 	// paymailHandlers.NewPaymentRequestHandler(deps.PaymentRequestService).RegisterRoutes(g)
