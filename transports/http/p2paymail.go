@@ -22,8 +22,8 @@ func NewP2PaymailHandler(svc service.P2Paymail) *p2PaymailHandler {
 
 // RegisterRoutes will setup all routes with an echo group.
 func (h *p2PaymailHandler) RegisterRoutes(g *echo.Group) {
-	g.POST("api/p2pDest/:paymail", h.p2pDest)
-	g.POST("api/p2pRawTx", h.p2pTxSubmit)
+	g.POST("/p2pDest/:paymail", h.p2pDest)
+	g.POST("/p2pRawTx", h.p2pTxSubmit)
 }
 
 // p2pDest generates a response object using the static capabilities file.

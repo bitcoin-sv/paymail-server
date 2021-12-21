@@ -6,28 +6,18 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	p4soc "github.com/libsv/p4-server/transports/sockets"
 	"github.com/nch-bowstave/paymail/config"
 	"github.com/nch-bowstave/paymail/data"
 	"github.com/nch-bowstave/paymail/data/payd"
-	"github.com/nch-bowstave/paymail/data/sockets"
 	"github.com/nch-bowstave/paymail/docs"
 	"github.com/nch-bowstave/paymail/log"
 	"github.com/nch-bowstave/paymail/service"
 	paymailHandlers "github.com/nch-bowstave/paymail/transports/http"
 	paymailMiddleware "github.com/nch-bowstave/paymail/transports/http/middleware"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/spf13/viper"
 	echoSwagger "github.com/swaggo/echo-swagger"
-	smw "github.com/theflyingcodr/sockets/middleware"
-	"github.com/theflyingcodr/sockets/server"
-
-	"github.com/libsv/p4-server/data/noop"
-	socData "github.com/libsv/p4-server/data/sockets"
 )
 
 // Deps holds all the dependencies.
@@ -87,104 +77,11 @@ func SetupSwagger(cfg config.Server, e *echo.Echo) {
 
 // SetupHTTPEndpoints will register the http endpoints.
 func SetupHTTPEndpoints(deps *Deps, e *echo.Echo) {
-	g := e.Group("/")
+	g := e.Group("/api")
 	// handlers
-
 	paymailHandlers.NewCapabilitiesHandler(deps.PaymailService).RegisterRoutes(g)
 	paymailHandlers.NewPkiHandler(deps.PkiService).RegisterRoutes(g)
 	paymailHandlers.NewP2PaymailHandler(deps.P2PaymailService).RegisterRoutes(g)
-}
-
-// SetupSockets will setup handlers and socket server.
-func SetupSockets(cfg config.Socket, e *echo.Echo) *server.SocketServer {
-	g := e.Group("/")
-	// create socket server
-	s := server.New(
-		server.WithMaxMessageSize(int64(cfg.MaxMessageBytes)),
-		server.WithChannelTimeout(cfg.ChannelTimeout))
-
-	// add middleware, with panic going first
-	s.WithMiddleware(smw.PanicHandler, smw.Timeout(smw.NewTimeoutConfig()), smw.Metrics())
-
-	p4soc.NewPaymentRequest().Register(s)
-	p4soc.NewPayment().Register(s)
-	paymailHandlers.NewProofs(service.NewProof(sockets.NewPayd(s))).RegisterRoutes(g)
-
-	// this is our websocket endpoint, clients will hit this with the channelID they wish to connect to
-	e.GET("/ws/:channelID", wsHandler(s))
-	return s
-}
-
-// SetupHybrid will setup handlers for http=>socket communication.
-func SetupHybrid(cfg config.Config, l log.Logger, e *echo.Echo) *server.SocketServer {
-	g := e.Group("/")
-	s := server.New(
-		server.WithMaxMessageSize(int64(cfg.Sockets.MaxMessageBytes)),
-		server.WithChannelTimeout(cfg.Sockets.ChannelTimeout))
-	paymentStore := socData.NewPayd(s)
-	paymentSvc := service.NewPayment(l, paymentStore)
-	if cfg.PayD.Noop {
-		noopStore := noop.NewNoOp(log.Noop{})
-		paymentSvc = service.NewPayment(log.Noop{}, noopStore)
-	}
-	paymentReqSvc := service.NewPaymentRequestProxy(paymentStore, cfg.Transports, cfg.Server)
-	proofsSvc := service.NewProof(paymentStore)
-
-	paymailHandlers.NewPaymentHandler(paymentSvc).RegisterRoutes(g)
-	paymailHandlers.NewPaymentRequestHandler(paymentReqSvc).RegisterRoutes(g)
-	paymailHandlers.NewProofs(proofsSvc).RegisterRoutes(g)
-	p4soc.NewHealthHandler().Register(s)
-
-	e.GET("/ws/:channelID", wsHandler(s))
-	return s
-}
-
-// wsHandler will upgrade connections to a websocket and then wait for messages.
-func wsHandler(svr *server.SocketServer) echo.HandlerFunc {
-	upgrader := websocket.Upgrader{}
-	return func(c echo.Context) error {
-		ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
-		if err != nil {
-			return err
-		}
-
-		defer func() {
-			_ = ws.Close()
-		}()
-		return svr.Listen(ws, c.Param("channelID"))
-	}
-}
-
-// SetupSocketMetrics will setup the socket server metrics.
-func SetupSocketMetrics(s *server.SocketServer) {
-	// simple metrics
-	gCo := promauto.NewGauge(prometheus.GaugeOpts{
-		Namespace: "sockets",
-		Subsystem: "server",
-		Name:      "gauge_total_connections",
-	})
-
-	s.OnClientJoin(func(clientID, channelID string) {
-		gCo.Inc()
-	})
-
-	s.OnClientLeave(func(clientID, channelID string) {
-		gCo.Dec()
-	})
-
-	gCh := promauto.NewGauge(prometheus.GaugeOpts{
-		Namespace: "sockets",
-		Subsystem: "server",
-		Name:      "gauge_total_channels",
-	})
-
-	s.OnChannelCreate(func(channelID string) {
-		gCh.Inc()
-	})
-
-	s.OnChannelClose(func(channelID string) {
-		gCh.Dec()
-	})
 }
 
 // PrintDev outputs some useful dev information such as http routes

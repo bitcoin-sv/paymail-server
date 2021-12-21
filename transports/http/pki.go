@@ -22,7 +22,7 @@ func NewPkiHandler(svc service.Pki) *pkiHandler {
 
 // RegisterRoutes will setup all routes with an echo group.
 func (h *pkiHandler) RegisterRoutes(g *echo.Group) {
-	g.GET("api/pki/:paymail", h.pkiCreate)
+	g.GET("/pki/:paymail", h.pkiCreate)
 }
 
 // pkiCreate generates a response object by forwarding the paymail to the pkiReader.

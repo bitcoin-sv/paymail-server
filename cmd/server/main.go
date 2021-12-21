@@ -48,7 +48,6 @@ func main() {
 		WithDeployment(appname).
 		WithLog().
 		WithPayD().
-		WithSockets().
 		WithTransports().
 		Load()
 	log := log.NewZero(cfg.Logging)
