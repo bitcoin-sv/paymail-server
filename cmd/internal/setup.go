@@ -26,18 +26,15 @@ import (
 	smw "github.com/theflyingcodr/sockets/middleware"
 	"github.com/theflyingcodr/sockets/server"
 
-	"github.com/libsv/go-p4"
 	"github.com/libsv/p4-server/data/noop"
 	socData "github.com/libsv/p4-server/data/sockets"
 )
 
 // Deps holds all the dependencies.
 type Deps struct {
-	PaymailService        service.Paymail
-	PkiService            service.Pki
-	PaymentService        p4.PaymentService
-	PaymentRequestService p4.PaymentRequestService
-	ProofsService         p4.ProofsService
+	PaymailService   service.Paymail
+	PkiService       service.Pki
+	P2PaymailService service.P2Paymail
 }
 
 // SetupDeps will setup all required dependent services.
@@ -55,22 +52,13 @@ func SetupDeps(cfg config.Config, l log.Logger) *Deps {
 
 	// services
 	paymailSvc := service.NewPaymail(l)
-	pkiSvc := service.NewPki(l)
-	paymentSvc := service.NewPayment(l, paydStore)
-	paymentReqSvc := service.NewPaymentRequest(cfg.Server, paydStore, paydStore)
-	if cfg.PayD.Noop {
-		noopStore := noop.NewNoOp(log.Noop{})
-		paymentSvc = service.NewPayment(log.Noop{}, noopStore)
-		paymentReqSvc = service.NewPaymentRequest(cfg.Server, noopStore, noopStore)
-	}
-	proofService := service.NewProof(paydStore)
+	pkiSvc := service.NewPki(l, paydStore)
+	p2paymailSvc := service.NewP2Paymail(l, paydStore)
 
 	return &Deps{
-		PaymailService:        paymailSvc,
-		PkiService:            pkiSvc,
-		PaymentService:        paymentSvc,
-		PaymentRequestService: paymentReqSvc,
-		ProofsService:         proofService,
+		PaymailService:   paymailSvc,
+		PkiService:       pkiSvc,
+		P2PaymailService: p2paymailSvc,
 	}
 }
 
@@ -104,10 +92,7 @@ func SetupHTTPEndpoints(deps *Deps, e *echo.Echo) {
 
 	paymailHandlers.NewCapabilitiesHandler(deps.PaymailService).RegisterRoutes(g)
 	paymailHandlers.NewPkiHandler(deps.PkiService).RegisterRoutes(g)
-
-	// paymailHandlers.NewPaymentHandler(deps.PaymentService).RegisterRoutes(g)
-	// paymailHandlers.NewPaymentRequestHandler(deps.PaymentRequestService).RegisterRoutes(g)
-	// paymailHandlers.NewProofs(deps.ProofsService).RegisterRoutes(g)
+	paymailHandlers.NewP2PaymailHandler(deps.P2PaymailService).RegisterRoutes(g)
 }
 
 // SetupSockets will setup handlers and socket server.

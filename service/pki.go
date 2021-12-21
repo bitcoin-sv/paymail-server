@@ -4,16 +4,19 @@ import (
 	"context"
 
 	"github.com/libsv/p4-server/log"
+	"github.com/nch-bowstave/paymail/data/payd"
 )
 
 type pki struct {
-	l log.Logger
+	l    log.Logger
+	payd *payd.Payd
 }
 
 // NewPaymail will create and return a new paymail service.
-func NewPki(l log.Logger) *pki {
+func NewPki(l log.Logger, payd *payd.Payd) *pki {
 	return &pki{
-		l: l,
+		l:    l,
+		payd: payd,
 	}
 }
 
@@ -25,19 +28,19 @@ type PkiResponse struct {
 
 // Paymail contains the handlers for paymail service endpoints.
 type Pki interface {
-	PkiCreate(ctx context.Context, paymail string) (*PkiResponse, error)
+	PkiReader(ctx context.Context, paymail string) (*PkiResponse, error)
 }
 
-func (svc *pki) PkiCreate(ctx context.Context, paymail string) (*PkiResponse, error) {
-	// TODO grab some pubkey from an account.
+func (svc *pki) PkiReader(ctx context.Context, paymail string) (*PkiResponse, error) {
+	// TODO grab some pubkey from an account based on this paymail
+	user, err := svc.payd.Owner(ctx)
+	if err != nil {
+		return nil, err
+	}
 	pki := &PkiResponse{
 		BsvAlias:  "1.0",
 		Handle:    paymail,
-		PublicKey: "0203654654654798798465465413546546546546854654645",
+		PublicKey: user.Name,
 	}
-	// err = json.Unmarshal(data, pki)
-	// if err != nil {
-	// 	return nil, err
-	// }
 	return pki, nil
 }

@@ -25,9 +25,9 @@ func (h *pkiHandler) RegisterRoutes(g *echo.Group) {
 	g.GET("api/pki/:paymail", h.pkiCreate)
 }
 
-// p2pDestCreate generates a response object using the static capabilities file.
+// pkiCreate generates a response object by forwarding the paymail to the pkiReader.
 func (h *pkiHandler) pkiCreate(e echo.Context) error {
-	resp, err := h.svc.PkiCreate(e.Request().Context(), e.Param("paymail"))
+	resp, err := h.svc.PkiReader(e.Request().Context(), e.Param("paymail"))
 	if err != nil {
 		return errors.WithStack(err)
 	}

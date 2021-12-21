@@ -24,15 +24,15 @@ const (
 	protocolSecure   = "https"
 )
 
-type payd struct {
+type Payd struct {
 	client data.HTTPClient
 	cfg    *config.PayD
 }
 
 // NewPayD will setup a new store that can interface with a payd wallet implementing
 // the Payment Protocol Interface.
-func NewPayD(cfg *config.PayD, client data.HTTPClient) *payd {
-	return &payd{
+func NewPayD(cfg *config.PayD, client data.HTTPClient) *Payd {
+	return &Payd{
 		cfg:    cfg,
 		client: client,
 	}
@@ -41,7 +41,7 @@ func NewPayD(cfg *config.PayD, client data.HTTPClient) *payd {
 // PaymentCreate will post a request to payd to validate and add the txos to the wallet.
 //
 // If invalid a non 204 status code is returned.
-func (p *payd) PaymentCreate(ctx context.Context, args p4.PaymentCreateArgs, req p4.Payment) (*p4.PaymentACK, error) {
+func (p *Payd) PaymentCreate(ctx context.Context, args p4.PaymentCreateArgs, req p4.Payment) (*p4.PaymentACK, error) {
 	paymentReq := models.PayDPaymentRequest{
 		RawTX:          req.RawTX,
 		SPVEnvelope:    req.SPVEnvelope,
@@ -60,7 +60,7 @@ func (p *payd) PaymentCreate(ctx context.Context, args p4.PaymentCreateArgs, req
 //
 // In this example, the payd wallet has no auth, in proper implementations auth would
 // be enabled and a cookie / oauth / bearer token etc would be passed down.
-func (p *payd) Owner(ctx context.Context) (*p4.Merchant, error) {
+func (p *Payd) Owner(ctx context.Context) (*p4.Merchant, error) {
 	var owner *p4.Merchant
 	if err := p.client.Do(ctx, http.MethodGet, fmt.Sprintf(urlOwner, p.baseURL()), http.StatusOK, nil, &owner); err != nil {
 		return nil, errors.WithStack(err)
@@ -68,7 +68,7 @@ func (p *payd) Owner(ctx context.Context) (*p4.Merchant, error) {
 	return owner, nil
 }
 
-func (p *payd) Destinations(ctx context.Context, args p4.PaymentRequestArgs) (*p4.Destinations, error) {
+func (p *Payd) Destinations(ctx context.Context, args p4.PaymentRequestArgs) (*p4.Destinations, error) {
 	var resp models.DestinationResponse
 	if err := p.client.Do(ctx, http.MethodGet, fmt.Sprintf(urlDestinations, p.baseURL(), args.PaymentID), http.StatusOK, nil, &resp); err != nil {
 		return nil, errors.WithStack(err)
@@ -92,12 +92,12 @@ func (p *payd) Destinations(ctx context.Context, args p4.PaymentRequestArgs) (*p
 }
 
 // ProofCreate will pass on the proof to a payd instance for storage.
-func (p *payd) ProofCreate(ctx context.Context, args p4.ProofCreateArgs, req envelope.JSONEnvelope) error {
+func (p *Payd) ProofCreate(ctx context.Context, args p4.ProofCreateArgs, req envelope.JSONEnvelope) error {
 	return errors.WithStack(p.client.Do(ctx, http.MethodPost, fmt.Sprintf(urlProofs, p.baseURL(), args.TxID), http.StatusCreated, req, nil))
 }
 
 // baseURL will return http or https depending on if we're using TLS.
-func (p *payd) baseURL() string {
+func (p *Payd) baseURL() string {
 	if p.cfg.Secure {
 		return fmt.Sprintf("%s://%s%s", protocolSecure, p.cfg.Host, p.cfg.Port)
 	}
