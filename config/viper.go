@@ -63,6 +63,13 @@ func (v *ViperConfig) WithPayD() ConfigurationLoader {
 	return v
 }
 
+func (v *ViperConfig) WithPaymail() ConfigurationLoader {
+	v.Paymail = &Paymail{
+		Root: viper.GetString(EnvPaymailRoot),
+	}
+	return v
+}
+
 // WithSockets reads socket env vars.
 func (v *ViperConfig) WithSockets() ConfigurationLoader {
 	v.Sockets = &Socket{

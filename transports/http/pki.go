@@ -31,5 +31,5 @@ func (h *pkiHandler) pkiCreate(e echo.Context) error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	return e.JSON(http.StatusCreated, resp)
+	return e.JSON(http.StatusAccepted, resp)
 }

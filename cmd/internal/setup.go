@@ -77,9 +77,10 @@ func SetupSwagger(cfg config.Server, e *echo.Echo) {
 
 // SetupHTTPEndpoints will register the http endpoints.
 func SetupHTTPEndpoints(deps *Deps, e *echo.Echo) {
+	c := e.Group("/")
 	g := e.Group("/api")
 	// handlers
-	paymailHandlers.NewCapabilitiesHandler(deps.PaymailService).RegisterRoutes(g)
+	paymailHandlers.NewCapabilitiesHandler(deps.PaymailService).RegisterRoutes(c)
 	paymailHandlers.NewPkiHandler(deps.PkiService).RegisterRoutes(g)
 	paymailHandlers.NewP2PaymailHandler(deps.P2PaymailService).RegisterRoutes(g)
 }

@@ -8,6 +8,7 @@ import (
 
 	"github.com/libsv/go-bk/crypto"
 	"github.com/libsv/go-bt/v2"
+	"github.com/nch-bowstave/paymail/config"
 	"github.com/nch-bowstave/paymail/data"
 	"gopkg.in/yaml.v2"
 )
@@ -28,11 +29,14 @@ type Capability struct {
 }
 
 // AddCapability is a function for dynamically adding capabilities from a yaml file.
-func (caps *CapabilitiesDocument) AddCapability(d []byte) error {
+func (caps *CapabilitiesDocument) AddCapability(cfg *config.Config, d []byte) error {
 	capability := &Capability{}
 	err := yaml.Unmarshal(d, capability)
 	if err != nil {
 		return err
+	}
+	if cfg != nil {
+		capability.Callback = cfg.Paymail.Root + capability.Callback
 	}
 	brfcID := GenerateBrfcID(capability)
 	if caps.Capabilities == nil {
@@ -61,14 +65,14 @@ func GenerateBrfcID(c *Capability) string {
 	return hex.EncodeToString(bt.ReverseBytes(crypto.Sha256d(cat)[26:]))
 }
 
-func GenerateCapabilitiesDocument() {
+func GenerateCapabilitiesDocument(cfg *config.Config) {
 	var capabilities CapabilitiesDocument
 	files, err := data.CapabilitiesData.LoadAll()
 	if err != nil {
 		panic(err)
 	}
 	for _, data := range files {
-		err = capabilities.AddCapability(data)
+		err = capabilities.AddCapability(cfg, data)
 		if err != nil {
 			panic(err)
 		}

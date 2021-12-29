@@ -2,8 +2,11 @@ package service
 
 import (
 	"context"
+	"fmt"
 
+	"github.com/libsv/go-p4"
 	"github.com/libsv/p4-server/log"
+	paydMessages "github.com/libsv/payd"
 	"github.com/nch-bowstave/paymail/data/payd"
 )
 
@@ -11,7 +14,7 @@ import (
 
 // Dest is the p2p destination request args
 type DestArgs struct {
-	Satoshis string `json:"satoshis"`
+	Satoshis uint64 `json:"satoshis"`
 }
 
 type DestResponse struct {
@@ -64,23 +67,38 @@ type P2Paymail interface {
 }
 
 func (svc *p2Paymail) Destinations(ctx context.Context, paymail string, args DestArgs) (*DestResponse, error) {
-	// TODO grab some destinations from PayD
-	user, err := svc.payd.Owner(ctx)
+	req := &paydMessages.InvoiceCreate{
+		Satoshis:    args.Satoshis,
+		SPVRequired: false,
+	}
+	// create an invoice on payd for the amount specified in the args
+	invoice, err := svc.payd.CreateInvoice(ctx, req)
 	if err != nil {
 		return nil, err
 	}
+
+	fmt.Printf("%+v", invoice)
+
+	// grab some destinations from PayD
+	response, err := svc.payd.Destinations(ctx, p4.PaymentRequestArgs{
+		PaymentID: invoice.ID,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Printf("%+v", response)
+
+	var outputs []Output
+	for _, output := range response.Outputs {
+		outputs = append(outputs, Output{
+			Script:   output.Script,
+			Satoshis: output.Amount,
+		})
+	}
 	dest := &DestResponse{
-		Reference: user.Name,
-		Outputs: []Output{
-			{
-				Satoshis: 1234,
-				Script:   "01",
-			},
-			{
-				Satoshis: 1234,
-				Script:   "01",
-			},
-		},
+		Reference: invoice.ID,
+		Outputs:   outputs,
 	}
 	return dest, nil
 }

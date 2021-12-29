@@ -8,9 +8,10 @@ services:
       context: .
     environment:
       DOMAIN_TLD: "nchain.com"
+      PAYMAIL_DOMAIN: "localhost"
       PAYMAIL_HOST: "paymail"
       PAYMAIL_PORT: "8446"
-      LOG_LEVEL: "info"
+      LOG_LEVEL: "debug"
       PAYD_HOST: "payd"
       PAYD_PORT: ":8443"
       TRANSPORT_MODE: "http"
@@ -18,6 +19,43 @@ services:
       - "8446:8446"
     networks:
       - regtest-stack
+
+  payd:
+    container_name: payd
+    image: libsv/payd:0.1.2
+    environment:
+      DB_DSN: "file:paydb/wallet.db?cache=shared&_foreign_keys=true"
+      DB_SCHEMA_PATH: "migrations"
+      SERVER_HOST: payd:8443
+      P4_HOST: 'p4:8445'
+      LOG_LEVEL: "debug"
+      WALLET_SPVREQUIRED: 'false'
+      ENV_BITCOIN_NETWORK: regtest
+      MAPI_CALLBACK_HOST: 'http://p4:8445'
+    volumes:
+      - payd-data:/paydb
+    ports:
+      - "8443:8443"
+    networks:
+      - regtest-stack
+
+  p4:
+    container_name: p4
+    image: libsv/p4:0.1.1
+    environment:
+      LOG_LEVEL: "debug"
+      TRANSPORT_MODE: 'http'
+      SERVER_HOST: p4
+      PAYD_HOST: "payd"
+      SERVER_FQDN: "p4:8445"
+    ports:
+      - "8445:8445"
+    networks:
+      - regtest-stack
+
+volumes:
+  payd-data:
+    external: false
 
 networks:
   regtest-stack:

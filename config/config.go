@@ -26,6 +26,7 @@ const (
 	EnvSocketChannelTimeoutSeconds = "socket.channel.timeoutseconds"
 	EnvSocketMaxMessageBytes       = "socket.maxmessage.bytes"
 	EnvTransportMode               = "transport.mode"
+	EnvPaymailRoot                 = "paymail.root"
 
 	LogDebug = "debug"
 	LogInfo  = "info"
@@ -43,6 +44,7 @@ type Config struct {
 	Server     *Server
 	Deployment *Deployment
 	PayD       *PayD
+	Paymail    *Paymail
 	Sockets    *Socket
 	Transports *Transports
 }
@@ -96,6 +98,10 @@ type PayD struct {
 	Noop            bool
 }
 
+type Paymail struct {
+	Root string
+}
+
 // Socket contains config items for a socket server.
 type Socket struct {
 	MaxMessageBytes int
@@ -116,5 +122,6 @@ type ConfigurationLoader interface {
 	WithPayD() ConfigurationLoader
 	WithSockets() ConfigurationLoader
 	WithTransports() ConfigurationLoader
+	WithPaymail() ConfigurationLoader
 	Load() *Config
 }
