@@ -42,6 +42,9 @@ func (h *p2PaymailHandler) p2pDest(e echo.Context) error {
 // p2pTxSubmit sends the rawtx to payd which sends to chain
 func (h *p2PaymailHandler) p2pTxSubmit(e echo.Context) error {
 	var args service.TxSubmitArgs
+	if err := e.Bind(&args); err != nil {
+		return errors.WithStack(err)
+	}
 	resp, err := h.svc.RawTx(e.Request().Context(), args)
 	if err != nil {
 		return errors.WithStack(err)

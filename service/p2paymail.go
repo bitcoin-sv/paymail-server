@@ -110,11 +110,11 @@ func (svc *p2Paymail) RawTx(ctx context.Context, args TxSubmitArgs) (*TxReceipt,
 				"signature": args.MetaData.Signature,
 			},
 		},
-		ProofCallbacks: map[string]p4.ProofCallback{
-			"": {
-				Token: "",
-			},
-		},
+		// ProofCallbacks: map[string]p4.ProofCallback{
+		// 	"": {
+		// 		Token: "",
+		// 	},
+		// },
 		RawTX: &args.RawTx,
 		Memo:  args.MetaData.Note,
 	}
