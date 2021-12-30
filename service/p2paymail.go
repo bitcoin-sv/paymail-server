@@ -2,8 +2,8 @@ package service
 
 import (
 	"context"
-	"fmt"
 
+	"github.com/libsv/go-bt/v2"
 	"github.com/libsv/go-p4"
 	"github.com/libsv/p4-server/log"
 	paydMessages "github.com/libsv/payd"
@@ -77,8 +77,6 @@ func (svc *p2Paymail) Destinations(ctx context.Context, paymail string, args Des
 		return nil, err
 	}
 
-	fmt.Printf("%+v", invoice)
-
 	// grab some destinations from PayD
 	response, err := svc.payd.Destinations(ctx, p4.PaymentRequestArgs{
 		PaymentID: invoice.ID,
@@ -86,8 +84,6 @@ func (svc *p2Paymail) Destinations(ctx context.Context, paymail string, args Des
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Printf("%+v", response)
 
 	var outputs []Output
 	for _, output := range response.Outputs {
@@ -104,14 +100,39 @@ func (svc *p2Paymail) Destinations(ctx context.Context, paymail string, args Des
 }
 
 func (svc *p2Paymail) RawTx(ctx context.Context, args TxSubmitArgs) (*TxReceipt, error) {
-	// TODO payment submit to PayD
-	user, err := svc.payd.Owner(ctx)
+	pcArgs := p4.PaymentCreateArgs{PaymentID: args.Reference}
+	req := p4.Payment{
+		MerchantData: p4.Merchant{
+			Name: args.MetaData.Signature,
+			ExtendedData: map[string]interface{}{
+				"paymail":   args.MetaData.Sender,
+				"pki":       args.MetaData.PublicKey,
+				"signature": args.MetaData.Signature,
+			},
+		},
+		ProofCallbacks: map[string]p4.ProofCallback{
+			"": {
+				Token: "",
+			},
+		},
+		RawTX: &args.RawTx,
+		Memo:  args.MetaData.Note,
+	}
+
+	receipt, err := svc.payd.PaymentCreate(ctx, pcArgs, req)
 	if err != nil {
 		return nil, err
 	}
-	receipt := &TxReceipt{
-		TxID: "685498798451651654654654654689749/874171089704897408740189410869406840",
-		Note: user.Name,
+
+	tx, err := bt.NewTxFromString(*receipt.Payment.RawTX)
+	if err != nil {
+		return nil, err
 	}
-	return receipt, nil
+	txid := tx.TxID()
+
+	dest := &TxReceipt{
+		TxID: txid,
+		Note: receipt.Payment.Memo,
+	}
+	return dest, nil
 }
