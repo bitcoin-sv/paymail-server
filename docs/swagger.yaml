@@ -1,0 +1,373 @@
+definitions:
+  bc.MapiCallback:
+    properties:
+      apiVersion:
+        type: string
+      blockHash:
+        type: string
+      blockHeight:
+        type: integer
+      callbackPayload:
+        type: string
+      callbackReason:
+        type: string
+      callbackTxId:
+        type: string
+      minerId:
+        type: string
+      timestamp:
+        type: string
+    type: object
+  bc.MerkleProof:
+    properties:
+      composite:
+        type: boolean
+      index:
+        type: integer
+      nodes:
+        items:
+          type: string
+        type: array
+      proofType:
+        type: string
+      target:
+        type: string
+      targetType:
+        type: string
+      txOrId:
+        type: string
+    type: object
+  bt.FeeQuote:
+    type: object
+  envelope.JSONEnvelope:
+    properties:
+      encoding:
+        type: string
+      mimetype:
+        type: string
+      payload:
+        type: string
+      publicKey:
+        type: string
+      signature:
+        type: string
+    type: object
+  p4.ClientError:
+    properties:
+      code:
+        example: N01
+        type: string
+      id:
+        example: e97970bf-2a88-4bc8-90e6-2f597a80b93d
+        type: string
+      message:
+        example: unable to find foo when loading bar
+        type: string
+      title:
+        example: not found
+        type: string
+    type: object
+  p4.MerchantData:
+    properties:
+      address:
+        description: Address is the merchants store / head office address.
+        example: 1 the street, the town, B1 1AA
+        type: string
+      avatar:
+        description: AvatarURL displays a canonical url to a merchants avatar.
+        example: http://url.com
+        type: string
+      email:
+        description: Email can be sued to contact the merchant about this transaction.
+        example: merchant@m.com
+        type: string
+      extendedData:
+        additionalProperties: true
+        description: ExtendedData can be supplied if the merchant wishes to send some
+          arbitrary data back to the wallet.
+        type: object
+      name:
+        description: MerchantName is a human readable string identifying the merchant.
+        example: merchant 1
+        type: string
+    type: object
+  p4.Output:
+    properties:
+      amount:
+        description: Amount is the number of satoshis to be paid.
+        example: 100000
+        type: integer
+      description:
+        description: Description, an optional description such as "tip" or "sales
+          tax". Maximum length is 100 chars.
+        example: paymentReference 123456
+        type: string
+      script:
+        description: Script is a locking script where payment should be sent, formatted
+          as a hexadecimal string.
+        example: 76a91455b61be43392125d127f1780fb038437cd67ef9c88ac
+        type: string
+    type: object
+  p4.PaymentACK:
+    properties:
+      error:
+        description: |-
+          A number indicating why the transaction was not accepted. 0 or undefined indicates no error.
+          A 1 or any other positive integer indicates an error. The errors are left undefined for now;
+          it is recommended only to use “1” and to fill the memo with a textual explanation about why
+          the transaction was not accepted until further numbers are defined and standardised.
+        type: integer
+      memo:
+        type: string
+      payment:
+        $ref: '#/definitions/p4.PaymentCreate'
+    type: object
+  p4.PaymentCreate:
+    properties:
+      memo:
+        description: Memo is a plain-text note from the customer to the payment host.
+        example: for invoice 123456
+        type: string
+      merchantData:
+        $ref: '#/definitions/p4.MerchantData'
+        description: |-
+          MerchantData is copied from PaymentDetails.merchantData.
+          Payment hosts may use invoice numbers or any other data they require to match Payments to PaymentRequests.
+          Note that malicious clients may modify the merchantData, so should be authenticated
+          in some way (for example, signed with a payment host-only key).
+          Maximum length is 10000 characters.
+      proofCallbacks:
+        additionalProperties:
+          $ref: '#/definitions/p4.ProofCallback'
+        description: |-
+          ProofCallbacks are optional and can be supplied when the sender wants to receive
+          a merkleproof for the transaction they are submitting as part of the SPV Envelope.
+
+          This is especially useful if they are receiving change and means when they use it
+          as an input, they can provide the merkle proof.
+        type: object
+      rawTx:
+        description: RawTX should be sent if SPVRequired is set to false in the payment
+          request.
+        type: string
+      refundTo:
+        description: |-
+          RefundTo is a paymail to send a refund to should a refund be necessary.
+          Maximum length is 100 characters
+        example: me@paymail.com
+        type: string
+      spvEnvelope:
+        $ref: '#/definitions/spv.Envelope'
+        description: |-
+          SPVEnvelope which contains the details of previous transaction and Merkle proof of each input UTXO.
+          Should be available if SPVRequired is set to true in the paymentRequest.
+          See https://tsc.bitcoinassociation.net/standards/spv-envelope/
+    type: object
+  p4.PaymentDestinations:
+    properties:
+      outputs:
+        items:
+          $ref: '#/definitions/p4.Output'
+        type: array
+    type: object
+  p4.PaymentRequest:
+    properties:
+      creationTimestamp:
+        description: |-
+          CreationTimestamp Unix timestamp (seconds since 1-Jan-1970 UTC) when the PaymentRequest was created.
+          Required.
+        example: "2019-10-12T07:20:50.52Z"
+        type: string
+      destinations:
+        $ref: '#/definitions/p4.PaymentDestinations'
+        description: |-
+          Destinations contains supported payment destinations by the merchant and p4 server, initial P2PKH outputs but can be extended.
+          Required.
+      expirationTimestamp:
+        description: |-
+          ExpirationTimestamp Unix timestamp (UTC) after which the PaymentRequest should be considered invalid.
+          Optional.
+        example: "2019-10-12T07:20:50.52Z"
+        type: string
+      fees:
+        $ref: '#/definitions/bt.FeeQuote'
+        description: |-
+          FeeRate defines the amount of fees a users wallet should add to the payment
+          when submitting their final payments.
+      memo:
+        description: |-
+          Memo Optional note that should be displayed to the customer, explaining what this PaymentRequest is for.
+          Maximum length is 50 characters.
+        example: invoice number 123456
+        type: string
+      merchantData:
+        $ref: '#/definitions/p4.MerchantData'
+        description: |-
+          MerchantData contains arbitrary data that may be used by the payment host to identify the PaymentRequest.
+          May be omitted if the payment host does not need to associate Payments with PaymentRequest
+          or if they associate each PaymentRequest with a separate payment address.
+          Maximum length is 10000 characters.
+      network:
+        description: |-
+          Network  Always set to "bitcoin" (but seems to be set to 'bitcoin-sv'
+          outside bip270 spec, see https://handcash.github.io/handcash-merchant-integration/#/merchant-payments)
+          {enum: bitcoin, bitcoin-sv, test}
+          Required.
+        enum:
+        - mainnet
+        - testnet
+        - stn
+        - regtest
+        example: mainnet
+        type: string
+      paymentUrl:
+        description: |-
+          PaymentURL secure HTTPS location where a Payment message (see below) will be sent to obtain a PaymentACK.
+          Maximum length is 4000 characters
+        example: https://localhost:3443/api/v1/payment/123456
+        type: string
+      spvRequired:
+        description: |-
+          SPVRequired if true will expect the sender to submit an SPVEnvelope in the payment request, otherwise
+          a rawTx will be required.
+        example: true
+        type: boolean
+    type: object
+  p4.ProofCallback:
+    properties:
+      token:
+        type: string
+    type: object
+  spv.Envelope:
+    properties:
+      mapiResponses:
+        items:
+          $ref: '#/definitions/bc.MapiCallback'
+        type: array
+      parents:
+        additionalProperties:
+          $ref: '#/definitions/spv.Envelope'
+        type: object
+      proof:
+        $ref: '#/definitions/bc.MerkleProof'
+      rawTx:
+        type: string
+      txid:
+        type: string
+    type: object
+host: localhost:8445
+info:
+  contact: {}
+  description: Payment Protocol Server is an implementation of a Bip-270 payment flow.
+  license:
+    name: ISC
+    url: https://github.com/libsv/go-payment_protocol/blob/master/LICENSE
+  termsOfService: https://github.com/libsv/go-payment_protocol/blob/master/CODE_STANDARDS.md
+  title: Payment Protocol Server
+  version: 0.0.1
+paths:
+  /api/v1/payment/{paymentID}:
+    get:
+      consumes:
+      - application/json
+      description: Creates a payment request based on a payment id (the identifier
+        for an invoice).
+      parameters:
+      - description: Payment ID
+        in: path
+        name: paymentID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: contains outputs, merchant data and expiry information, used
+            by the payee to construct a transaction
+          schema:
+            $ref: '#/definitions/p4.PaymentRequest'
+        "400":
+          description: returned if the user input is invalid, usually an issue with
+            the paymentID
+          schema:
+            $ref: '#/definitions/p4.ClientError'
+        "404":
+          description: returned if the paymentID has not been found
+          schema:
+            $ref: '#/definitions/p4.ClientError'
+        "500":
+          description: returned if there is an unexpected internal error
+          schema:
+            type: string
+      summary: Request to pay an invoice and receive back outputs to use when constructing
+        the payment transaction
+      tags:
+      - Payment
+    post:
+      consumes:
+      - application/json
+      description: Creates a payment based on a payment id (the identifier for an
+        invoice).
+      parameters:
+      - description: Payment ID
+        in: path
+        name: paymentID
+        required: true
+        type: string
+      - description: payment message used in BIP270
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/p4.PaymentCreate'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: if success, error code will be empty, otherwise it will be
+            filled in with reason
+          schema:
+            $ref: '#/definitions/p4.PaymentACK'
+        "400":
+          description: returned if the user input is invalid, usually an issue with
+            the paymentID
+          schema:
+            $ref: '#/definitions/p4.ClientError'
+        "404":
+          description: returned if the paymentID has not been found
+          schema:
+            $ref: '#/definitions/p4.ClientError'
+        "500":
+          description: returned if there is an unexpected internal error
+          schema:
+            type: string
+      summary: A user will submit an SpvEnvelope along with other information that
+        is validated before being broadcast to the network.
+      tags:
+      - Payment
+  /v1/proofs/{txid}:
+    post:
+      consumes:
+      - application/json
+      description: Creates a json envelope proof
+      parameters:
+      - description: Transaction ID
+        in: path
+        name: txid
+        required: true
+        type: string
+      - description: JSON Envelope
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/envelope.JSONEnvelope'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: ""
+      summary: InvoiceCreate proof
+      tags:
+      - Proofs
+swagger: "2.0"

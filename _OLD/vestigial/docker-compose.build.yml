@@ -1,0 +1,7 @@
+version: "3.7"
+
+services:
+  paymail:
+    image: paymail.service
+    build:
+      context: .

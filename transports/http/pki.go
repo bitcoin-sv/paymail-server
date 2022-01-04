@@ -1,40 +1,35 @@
-package web
+package http
 
 import (
 	"net/http"
 
-	"github.com/labstack/echo"
-	"github.com/nch-bowstave/paymail"
+	"github.com/labstack/echo/v4"
+	"github.com/nch-bowstave/paymail/service"
 	"github.com/pkg/errors"
 )
 
-type pki struct {
-	svc paymail.AccountService
+// pkiHandler is an http handler that supports BIP-270 requests.
+type pkiHandler struct {
+	svc service.Pki
 }
 
-// NewPKI will create a new pki transport.
-func NewPKI(svc paymail.AccountService) *pki {
-	return &pki{svc: svc}
+// NewP2PdDestHandler will create and return a new capabilitiesHandler.
+func NewPkiHandler(svc service.Pki) *pkiHandler {
+	return &pkiHandler{
+		svc: svc,
+	}
 }
 
-// RegisterRoutes will setup the routes with the echo group.
-func (b *pki) RegisterRoutes(g *echo.Group) {
-	g.GET(routePki, b.PKI)
+// RegisterRoutes will setup all routes with an echo group.
+func (h *pkiHandler) RegisterRoutes(g *echo.Group) {
+	g.GET("/pki/:paymail", h.pkiCreate)
 }
 
-// PKI Public Key Infrastructure returns a users handle, bsv alias version, and public key for a user handle (if exists),
-func (b *pki) PKI(e echo.Context) error {
-	handle := paymail.Handle(e.Param("handle"))
-	account, err := b.svc.Account(e.Request().Context(), handle)
+// pkiCreate generates a response object by forwarding the paymail to the pkiReader.
+func (h *pkiHandler) pkiCreate(e echo.Context) error {
+	resp, err := h.svc.PkiReader(e.Request().Context(), e.Param("paymail"))
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	if account == nil {
-		return e.JSON(http.StatusNotFound, nil)
-	}
-	return e.JSON(http.StatusOK, &paymail.PKI{
-		BsvAlias:  "1.0",
-		Handle:    account.Handle,
-		PublicKey: account.PublicKey,
-	})
+	return e.JSON(http.StatusAccepted, resp)
 }

@@ -1,0 +1,8 @@
+title: Peer Channel Connections
+authors:
+  - Kapil (nChain)
+  - Jad (nChain)
+  - Deggen (nChain)
+version: 1.0
+callback: /api/peer/{alias}@{domain.tld}
+readme: https://libsv.github.io/

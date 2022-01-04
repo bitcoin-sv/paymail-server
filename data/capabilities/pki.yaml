@@ -1,0 +1,7 @@
+title: bsvalias Public Key Infrastructure
+authors:
+  - andy (nChain)
+  - Ryan X. Charles (Money Button)
+version: 1
+callback: /api/pki/{alias}@{domain.tld}
+readme: https://libsv.github.io/
