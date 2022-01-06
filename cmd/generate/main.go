@@ -14,4 +14,5 @@ func main() {
 	}
 	// generate a static capabilities document based on the files in data/capabilities.
 	internal.GenerateCapabilitiesDocument(cfg)
+	internal.GenerateCapabilitiesDocumentV1(cfg)
 }

@@ -49,10 +49,27 @@ func (d *Directory) LoadStaticDocument() ([]byte, error) {
 	return data, nil
 }
 
+// LoadStaticDocumentV1 will return the generated document if it exists.
+func (d *Directory) LoadStaticDocumentV1() ([]byte, error) {
+	data, err := os.ReadFile("/app/data/capabilities_v1.json")
+	if err != nil {
+		return nil, errors.Wrap(err, "you have to run the setup to generate the static capabilities")
+	}
+	return data, nil
+}
+
 // OverwriteStaticCapabilitiesFile is self explanitory, however the important note is that this filepath is relative.
 // Run server must be done from root directory of the package for this reason.
 func OverwriteStaticCapabilitiesFile(data []byte) error {
 	path := "/app/data/capabilities.json"
+	_ = os.Remove(path)
+	return os.WriteFile(path, data, 0644)
+}
+
+// OverwriteStaticCapabilitiesFile is self explanitory, however the important note is that this filepath is relative.
+// Run server must be done from root directory of the package for this reason.
+func OverwriteStaticCapabilitiesFileV1(data []byte) error {
+	path := "/app/data/capabilities_v1.json"
 	_ = os.Remove(path)
 	return os.WriteFile(path, data, 0644)
 }

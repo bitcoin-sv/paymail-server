@@ -22,14 +22,15 @@ func NewCapabilitiesHandler(svc service.Paymail) *capabilitiesHandler {
 
 // RegisterRoutes will setup all routes with an echo group.
 func (h *capabilitiesHandler) RegisterRoutes(g *echo.Group) {
-	g.GET(".well-known/bsvalias", h.capabilitiesResponse)
+	g.GET(".well-known/bsvalias.json", h.capabilitiesResponse)
+	g.GET(".well-known/bsvalias", h.capabilitiesResponse) // backward compatible version
 }
 
 // capabilitiesResponse generates a response object using the static capabilities file.
 func (h *capabilitiesHandler) capabilitiesResponse(e echo.Context) error {
-	resp, err := h.svc.Capabilities(e.Request().Context())
+	data, err := h.svc.Capabilities(e.Request().Context(), e.Request().URL.Path)
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	return e.JSON(http.StatusCreated, resp)
+	return e.JSONBlob(http.StatusCreated, data)
 }

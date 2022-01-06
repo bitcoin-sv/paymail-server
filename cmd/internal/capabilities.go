@@ -67,6 +67,7 @@ func GenerateBrfcID(c *Capability) string {
 
 func GenerateCapabilitiesDocument(cfg *config.Config) {
 	var capabilities CapabilitiesDocument
+	capabilities.Version = "2.0"
 	files, err := data.CapabilitiesData.LoadAll()
 	if err != nil {
 		panic(err)

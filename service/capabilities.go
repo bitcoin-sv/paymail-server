@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/libsv/p4-server/log"
 	"github.com/nch-bowstave/paymail/data"
@@ -12,6 +11,12 @@ import (
 type CapabilitiesDocument struct {
 	Version      string                 `json:"version"`
 	Capabilities map[string]*Capability `json:"capabilities"`
+}
+
+// CapabilitiesDocument is the whole response body for the capability discovery mechanism of Paymail.
+type CapabilitiesDocumentV1 struct {
+	Version      string            `json:"version"`
+	Capabilities map[string]string `json:"capabilities"`
 }
 
 // Capability is a single capablity as defined by some brfcid specification.
@@ -36,20 +41,14 @@ func NewPaymail(l log.Logger) *paymail {
 
 // Paymail contains the handlers for paymail service endpoints.
 type Paymail interface {
-	Capabilities(ctx context.Context) (*CapabilitiesDocument, error)
+	Capabilities(ctx context.Context, url string) ([]byte, error)
 }
 
 // Capabilties will create the response from a static document and return it.
-func (svc *paymail) Capabilities(ctx context.Context) (*CapabilitiesDocument, error) {
-	data, err := data.CapabilitiesData.LoadStaticDocument()
-	if err != nil {
-		svc.l.Error(err, "capabilities.json document not found")
-		return nil, err
+func (svc *paymail) Capabilities(ctx context.Context, path string) ([]byte, error) {
+	if path == "/.well-known/bsvalias.json" {
+		return data.CapabilitiesData.LoadStaticDocument()
+	} else {
+		return data.CapabilitiesData.LoadStaticDocumentV1()
 	}
-	caps := &CapabilitiesDocument{}
-	err = json.Unmarshal(data, caps)
-	if err != nil {
-		return nil, err
-	}
-	return caps, err
 }
