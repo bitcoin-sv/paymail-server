@@ -33,7 +33,7 @@ func (n *noop) PaymentCreate(ctx context.Context, args p4.PaymentCreateArgs, req
 //
 // In this example, the payd wallet has no auth, in proper implementations auth would
 // be enabled and a cookie / oauth / bearer token etc would be passed down.
-func (n *noop) Owner(ctx context.Context) (*p4.Merchant, error) {
+func (n *noop) User(ctx context.Context) (*p4.Merchant, error) {
 	n.l.Info("hit noop.Owner")
 	return &p4.Merchant{
 		AvatarURL:    "noop",

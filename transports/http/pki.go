@@ -5,7 +5,6 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/nch-bowstave/paymail/service"
-	"github.com/pkg/errors"
 )
 
 // pkiHandler is an http handler that supports BIP-270 requests.
@@ -27,9 +26,6 @@ func (h *pkiHandler) RegisterRoutes(g *echo.Group) {
 
 // pkiCreate generates a response object by forwarding the paymail to the pkiReader.
 func (h *pkiHandler) pkiCreate(e echo.Context) error {
-	resp, err := h.svc.PkiReader(e.Request().Context(), e.Param("paymail"))
-	if err != nil {
-		return errors.WithStack(err)
-	}
+	resp := h.svc.PkiReader(e.Request().Context(), e.Param("paymail"))
 	return e.JSON(http.StatusAccepted, resp)
 }

@@ -2,10 +2,9 @@ package service
 
 import (
 	"context"
-	"crypto/elliptic"
-	"encoding/hex"
+	"fmt"
+	"strings"
 
-	"github.com/bitcoinsv/bsvd/bsvec"
 	"github.com/libsv/p4-server/log"
 	"github.com/nch-bowstave/paymail/data/payd"
 )
@@ -26,33 +25,37 @@ func NewPki(l log.Logger, payd *payd.Payd) *pki {
 type PkiResponse struct {
 	BsvAlias  string `json:"bsvalias"`
 	Handle    string `json:"handle"`
-	PublicKey string `json:"pubkey"`
+	PublicKey string `json:"pubkey,omitempty"`
+	ErrorMsg  string `json:"error,omitempty"`
 }
 
 // Paymail contains the handlers for paymail service endpoints.
 type Pki interface {
-	PkiReader(ctx context.Context, paymail string) (*PkiResponse, error)
+	PkiReader(ctx context.Context, paymail string) *PkiResponse
 }
 
-func (svc *pki) PkiReader(ctx context.Context, paymail string) (*PkiResponse, error) {
-	// TODO grab some pubkey from an account based on this paymail
-	// pki, err := svc.payd.Pki(ctx)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// replace this once pki is implemented within PayD
-	key, err := bsvec.NewPrivateKey(elliptic.P256())
+func (svc *pki) PkiReader(ctx context.Context, paymail string) *PkiResponse {
+	p := strings.FieldsFunc(paymail, func(r rune) bool {
+		return string(r) == "@"
+	})
+	handle := p[0]
+	// domain = p[1]
+	// TODO check domain matches one of our env paymail domains
+	user, err := svc.payd.User(ctx, handle)
 	if err != nil {
-		return nil, err
+		return &PkiResponse{
+			BsvAlias: "1.0",
+			Handle:   paymail,
+			ErrorMsg: "Not found at this domain.",
+		}
 	}
 
-	pubkey := key.PubKey()
+	pk := fmt.Sprintf("%s", user.ExtendedData["pki"])
 
 	pki := &PkiResponse{
 		BsvAlias:  "1.0",
 		Handle:    paymail,
-		PublicKey: hex.EncodeToString(pubkey.SerializeCompressed()),
+		PublicKey: pk,
 	}
-	return pki, nil
+	return pki
 }

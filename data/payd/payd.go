@@ -19,6 +19,7 @@ import (
 const (
 	urlPayments      = "%s/api/v1/payments/%s"
 	urlOwner         = "%s/api/v1/owner"
+	urlUser          = "%s/api/v1/user/%s"
 	urlCreate        = "%s/api/v1/invoices"
 	urlDestinations  = "%s/api/v1/destinations/%s"
 	urlProofs        = "%s/api/v1/proofs/%s"
@@ -58,16 +59,16 @@ func (p *Payd) PaymentCreate(ctx context.Context, args p4.PaymentCreateArgs, req
 	}, nil
 }
 
-// Owner will return information regarding the owner of a payd wallet.
+// User will return information regarding the owner of a payd wallet.
 //
 // In this example, the payd wallet has no auth, in proper implementations auth would
 // be enabled and a cookie / oauth / bearer token etc would be passed down.
-func (p *Payd) Owner(ctx context.Context) (*p4.Merchant, error) {
-	var owner *p4.Merchant
-	if err := p.client.Do(ctx, http.MethodGet, fmt.Sprintf(urlOwner, p.baseURL()), http.StatusOK, nil, &owner); err != nil {
+func (p *Payd) User(ctx context.Context, handle string) (*p4.Merchant, error) {
+	var user *p4.Merchant
+	if err := p.client.Do(ctx, http.MethodGet, fmt.Sprintf(urlUser, p.baseURL(), handle), http.StatusOK, nil, &user); err != nil {
 		return nil, errors.WithStack(err)
 	}
-	return owner, nil
+	return user, nil
 }
 
 func (p *Payd) CreateInvoice(ctx context.Context, req *paydMessages.InvoiceCreate) (*paydMessages.Invoice, error) {
