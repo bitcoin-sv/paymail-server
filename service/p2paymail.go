@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"strings"
 
 	"github.com/libsv/go-bt/v2"
 	"github.com/libsv/go-p4"
@@ -52,6 +53,13 @@ type p2Paymail struct {
 	payd *payd.Payd
 }
 
+func getHandleFromPaymail(paymail string) string {
+	p := strings.FieldsFunc(paymail, func(r rune) bool {
+		return string(r) == "@"
+	})
+	return p[0]
+}
+
 // NewPaymail will create and return a new paymail service.
 func NewP2Paymail(l log.Logger, payd *payd.Payd) *p2Paymail {
 	return &p2Paymail{
@@ -67,7 +75,9 @@ type P2Paymail interface {
 }
 
 func (svc *p2Paymail) Destinations(ctx context.Context, paymail string, args DestArgs) (*DestResponse, error) {
+	handle := getHandleFromPaymail(paymail)
 	req := &paydMessages.InvoiceCreate{
+		Handle:      handle,
 		Satoshis:    args.Satoshis,
 		SPVRequired: false,
 	}
