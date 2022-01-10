@@ -7,8 +7,8 @@ import (
 	"github.com/libsv/go-bt/v2"
 	"github.com/libsv/go-p4"
 	"github.com/libsv/p4-server/log"
-	paydMessages "github.com/libsv/payd"
-	"github.com/nch-bowstave/paymail/data/payd"
+	"github.com/libsv/payd"
+	paydData "github.com/nch-bowstave/paymail/data/payd"
 )
 
 // ref: https://docs.moneybutton.com/docs/paymail/paymail-06-p2p-transactions.html
@@ -50,7 +50,7 @@ type TxReceipt struct {
 
 type p2Paymail struct {
 	l    log.Logger
-	payd *payd.Payd
+	payd *paydData.Payd
 }
 
 func getHandleFromPaymail(paymail string) string {
@@ -61,7 +61,7 @@ func getHandleFromPaymail(paymail string) string {
 }
 
 // NewPaymail will create and return a new paymail service.
-func NewP2Paymail(l log.Logger, payd *payd.Payd) *p2Paymail {
+func NewP2Paymail(l log.Logger, payd *paydData.Payd) *p2Paymail {
 	return &p2Paymail{
 		l:    l,
 		payd: payd,
@@ -76,8 +76,8 @@ type P2Paymail interface {
 
 func (svc *p2Paymail) Destinations(ctx context.Context, paymail string, args DestArgs) (*DestResponse, error) {
 	handle := getHandleFromPaymail(paymail)
-	req := &paydMessages.InvoiceCreate{
-		Handle:      handle,
+	req := &payd.InvoiceCreate{
+		Handle:      handle, // TODO use latest version of payd which has this parameter within Invoice Create type.
 		Satoshis:    args.Satoshis,
 		SPVRequired: false,
 	}

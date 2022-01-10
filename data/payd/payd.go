@@ -11,7 +11,7 @@ import (
 	"github.com/libsv/go-p4"
 	"github.com/libsv/p4-server/data"
 	"github.com/libsv/p4-server/data/payd/models"
-	paydMessages "github.com/libsv/payd"
+	"github.com/libsv/payd"
 	"github.com/nch-bowstave/paymail/config"
 )
 
@@ -71,7 +71,7 @@ func (p *Payd) User(ctx context.Context, handle string) (*p4.Merchant, error) {
 	return user, nil
 }
 
-func (p *Payd) CreateInvoice(ctx context.Context, req *paydMessages.InvoiceCreate) (*paydMessages.Invoice, error) {
+func (p *Payd) CreateInvoice(ctx context.Context, req *payd.InvoiceCreate) (*paydMessages.Invoice, error) {
 	var res paydMessages.Invoice
 	if err := p.client.Do(ctx, http.MethodPost, fmt.Sprintf(urlCreate, p.baseURL()), http.StatusCreated, &req, &res); err != nil {
 		return nil, errors.WithStack(err)
