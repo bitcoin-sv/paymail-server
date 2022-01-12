@@ -9,6 +9,7 @@ import (
 	"github.com/libsv/p4-server/log"
 	"github.com/libsv/payd"
 	paydData "github.com/nch-bowstave/paymail/data/payd"
+	"gopkg.in/guregu/null.v3"
 )
 
 // ref: https://docs.moneybutton.com/docs/paymail/paymail-06-p2p-transactions.html
@@ -77,7 +78,7 @@ type P2Paymail interface {
 func (svc *p2Paymail) Destinations(ctx context.Context, paymail string, args DestArgs) (*DestResponse, error) {
 	handle := getHandleFromPaymail(paymail)
 	req := &payd.InvoiceCreate{
-		Handle:      handle, // TODO use latest version of payd which has this parameter within Invoice Create type.
+		Handle:      null.StringFrom(handle), // TODO use latest version of payd which has this parameter within Invoice Create type.
 		Satoshis:    args.Satoshis,
 		SPVRequired: false,
 	}
@@ -120,14 +121,12 @@ func (svc *p2Paymail) RawTx(ctx context.Context, args TxSubmitArgs) (*TxReceipt,
 				"signature": args.MetaData.Signature,
 			},
 		},
-		// ProofCallbacks: map[string]p4.ProofCallback{
-		// 	"": {
-		// 		Token: "",
-		// 	},
-		// },
 		RawTX: &args.RawTx,
 		Memo:  args.MetaData.Note,
 	}
+
+	// TODO storing the requests for future reference - debugging
+	// TODO check incoming signature across the TxID (use go-paymail)
 
 	receipt, err := svc.payd.PaymentCreate(ctx, pcArgs, req)
 	if err != nil {

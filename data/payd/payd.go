@@ -71,8 +71,8 @@ func (p *Payd) User(ctx context.Context, handle string) (*p4.Merchant, error) {
 	return user, nil
 }
 
-func (p *Payd) CreateInvoice(ctx context.Context, req *payd.InvoiceCreate) (*paydMessages.Invoice, error) {
-	var res paydMessages.Invoice
+func (p *Payd) CreateInvoice(ctx context.Context, req *payd.InvoiceCreate) (*payd.Invoice, error) {
+	var res payd.Invoice
 	if err := p.client.Do(ctx, http.MethodPost, fmt.Sprintf(urlCreate, p.baseURL()), http.StatusCreated, &req, &res); err != nil {
 		return nil, errors.WithStack(err)
 	}

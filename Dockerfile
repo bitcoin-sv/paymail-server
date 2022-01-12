@@ -20,6 +20,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o server -ldflags="-s -w" ./cmd/server
 
 FROM scratch
 
+COPY --from=builder /app/data/sqlite/migrations/ /migrations
 COPY --from=builder /app/generate /bin/
 COPY --from=builder /app/server /bin/
 COPY --from=builder /app/data /app/data

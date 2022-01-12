@@ -4,9 +4,9 @@ services:
   paymail:
     container_name: paymail
     image: local.paymail
-    build:
-      context: .
     environment:
+      DB_DSN: "file:paydb/paymail.db?cache=shared&_foreign_keys=true"
+      DB_SCHEMA_PATH: "migrations/paymail"
       DOMAIN_TLD: "nchain.com"
       PAYMAIL_DOMAIN: "localhost"
       PAYMAIL_HOST: "paymail"
@@ -17,6 +17,26 @@ services:
       TRANSPORT_MODE: "http"
     ports:
       - "8446:8446"
+    networks:
+      - regtest-stack
+
+  payd:
+    container_name: payd
+    image: local.payd
+    environment:
+      DB_DSN: "file:paydb/wallet.db?cache=shared&_foreign_keys=true"
+      DB_SCHEMA_PATH: "migrations"
+      LOG_LEVEL: "info"
+      P4_HOST: "ws://p4:8445/ws"
+      MAPI_CALLBACK_HOST: "http://p4:8445"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "localhost:8443/api/v1/health" ]
+      interval: 30s
+      timeout: 10s
+    volumes:
+      - payd-data:/paydb
+    ports:
+      - "8443:8443"
     networks:
       - regtest-stack
 

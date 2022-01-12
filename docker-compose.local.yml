@@ -1,0 +1,14 @@
+version: "3.7"
+
+services:
+  paymail:
+    container_name: paymail
+    image: local.paymail
+    volumes:
+      - ./run/regtest/paymail:/paydb
+  payd:
+    container_name: payd
+    image: local.payd
+    volumes:
+      - ./run/regtest/payd:/paydb
+
