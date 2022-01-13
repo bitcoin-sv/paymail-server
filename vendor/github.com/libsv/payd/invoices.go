@@ -60,8 +60,7 @@ type Invoice struct {
 
 // InvoiceCreate is used to create a new invoice.
 type InvoiceCreate struct {
-	Handle    null.String `json:"handle,omitempty" db:"handle,omitempty"`
-	InvoiceID string      `json:"-" db:"invoice_id"`
+	InvoiceID string `json:"-" db:"invoice_id"`
 	// Satoshis is the total amount this invoice is to pay.
 	Satoshis uint64 `json:"satoshis" db:"satoshis"`
 	// Reference is an identifier that can be used to link the

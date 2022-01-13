@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"regexp"
 	"time"
 )
 
@@ -27,6 +28,10 @@ const (
 	EnvSocketMaxMessageBytes       = "socket.maxmessage.bytes"
 	EnvTransportMode               = "transport.mode"
 	EnvPaymailRoot                 = "paymail.root"
+	EnvDb                          = "db.type"
+	EnvDbSchema                    = "db.schema.path"
+	EnvDbDsn                       = "db.dsn"
+	EnvDbMigrate                   = "db.migrate"
 
 	LogDebug = "debug"
 	LogInfo  = "info"
@@ -41,6 +46,7 @@ const (
 // Config returns strongly typed config values.
 type Config struct {
 	Logging    *Logging
+	Db         *Db
 	Server     *Server
 	Deployment *Deployment
 	PayD       *PayD
@@ -59,6 +65,26 @@ type Deployment struct {
 	Commit      string
 	BuildDate   time.Time
 }
+
+// Db contains database information.
+type Db struct {
+	Type       DbType
+	SchemaPath string
+	Dsn        string
+	MigrateDb  bool
+}
+
+// DbType is used to restrict the dbs we can support.
+type DbType string
+
+// Supported database types.
+const (
+	DBSqlite   DbType = "sqlite"
+	DBMySQL    DbType = "mysql"
+	DBPostgres DbType = "postgres"
+)
+
+var reDbType = regexp.MustCompile(`sqlite|mysql|postgres`)
 
 // IsDev determines if this app is running on a dev environment.
 func (d *Deployment) IsDev() bool {
@@ -117,6 +143,7 @@ type Transports struct {
 // into a struct that contains a configuration.
 type ConfigurationLoader interface {
 	WithServer() ConfigurationLoader
+	WithDb() ConfigurationLoader
 	WithDeployment(app string) ConfigurationLoader
 	WithLog() ConfigurationLoader
 	WithPayD() ConfigurationLoader

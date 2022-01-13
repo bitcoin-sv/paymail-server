@@ -8,6 +8,7 @@ import (
 
 	"github.com/nch-bowstave/paymail/cmd/internal"
 	"github.com/nch-bowstave/paymail/config"
+	"github.com/nch-bowstave/paymail/config/databases"
 	"github.com/nch-bowstave/paymail/log"
 )
 
@@ -46,6 +47,7 @@ func main() {
 	config.SetupDefaults()
 	cfg := config.NewViperConfig(appname).
 		WithServer().
+		WithDb().
 		WithDeployment(appname).
 		WithLog().
 		WithPayD().
@@ -56,6 +58,12 @@ func main() {
 	if err := cfg.Validate(); err != nil {
 		log.Fatal(err, "config error")
 	}
+	db, err := databases.NewDbSetup().SetupDb(log, cfg.Db)
+	if err != nil {
+		log.Fatal(err, "failed to setup database")
+	}
+	// nolint:errcheck // dont care about error.
+	defer db.Close()
 
 	e := internal.SetupEcho(log)
 

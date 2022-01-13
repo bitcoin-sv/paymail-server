@@ -2,14 +2,12 @@ package service
 
 import (
 	"context"
-	"strings"
 
 	"github.com/libsv/go-bt/v2"
 	"github.com/libsv/go-p4"
 	"github.com/libsv/p4-server/log"
 	"github.com/libsv/payd"
 	paydData "github.com/nch-bowstave/paymail/data/payd"
-	"gopkg.in/guregu/null.v3"
 )
 
 // ref: https://docs.moneybutton.com/docs/paymail/paymail-06-p2p-transactions.html
@@ -54,11 +52,9 @@ type p2Paymail struct {
 	payd *paydData.Payd
 }
 
-func getHandleFromPaymail(paymail string) string {
-	p := strings.FieldsFunc(paymail, func(r rune) bool {
-		return string(r) == "@"
-	})
-	return p[0]
+func getUserIDFromPaymail(paymail string) uint64 {
+	// TODO lookup the paymail in our database and return a user_id
+	return 1
 }
 
 // NewPaymail will create and return a new paymail service.
@@ -76,9 +72,9 @@ type P2Paymail interface {
 }
 
 func (svc *p2Paymail) Destinations(ctx context.Context, paymail string, args DestArgs) (*DestResponse, error) {
-	handle := getHandleFromPaymail(paymail)
+	userID := getUserIDFromPaymail(paymail)
 	req := &payd.InvoiceCreate{
-		Handle:      null.StringFrom(handle), // TODO use latest version of payd which has this parameter within Invoice Create type.
+		UserID:      userID, // TODO use latest version of payd which has this parameter within Invoice Create type.
 		Satoshis:    args.Satoshis,
 		SPVRequired: false,
 	}

@@ -45,6 +45,17 @@ func (v *ViperConfig) WithDeployment(appName string) ConfigurationLoader {
 	return v
 }
 
+// WithDb sets up and returns database configuration.
+func (v *ViperConfig) WithDb() ConfigurationLoader {
+	v.Db = &Db{
+		Type:       DbType(viper.GetString(EnvDb)),
+		Dsn:        viper.GetString(EnvDbDsn),
+		SchemaPath: viper.GetString(EnvDbSchema),
+		MigrateDb:  viper.GetBool(EnvDbMigrate),
+	}
+	return v
+}
+
 // WithLog sets up and returns log config.
 func (v *ViperConfig) WithLog() ConfigurationLoader {
 	v.Logging = &Logging{Level: viper.GetString(EnvLogLevel)}

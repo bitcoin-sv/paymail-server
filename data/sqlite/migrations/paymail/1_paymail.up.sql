@@ -3,3 +3,7 @@ CREATE TABLE aliases (
     ,user_id INTEGER
     ,UNIQUE(paymail)
 )
+
+INSERT INTO 
+    aliases(paymail, user_id)
+    VALUES("epic@nchain.com", 1)
