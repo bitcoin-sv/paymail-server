@@ -39,7 +39,7 @@ func SetupDeps(cfg config.Config, l log.Logger) *Deps {
 	}
 	// stores
 	paydStore := payd.NewPayD(cfg.PayD, data.NewClient(httpClient))
-	paymailStore := data.sqlite.NewPayD(cfg.PayD, data.NewClient(httpClient))
+	// paymailStore := data.NewPaymail(cfg.PayD, sqlite.Store)
 
 	// services
 	paymailSvc := service.NewPaymail(l)

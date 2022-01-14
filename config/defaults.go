@@ -17,6 +17,12 @@ func SetupDefaults() {
 	viper.SetDefault(EnvServerSwaggerEnabled, true)
 	viper.SetDefault(EnvServerSwaggerHost, "localhost:8446")
 
+	// db
+	viper.SetDefault(EnvDb, "sqlite")
+	viper.SetDefault(EnvDbDsn, "file:data/wallet.db?_foreign_keys=true&pooled=true")
+	viper.SetDefault(EnvDbSchema, "data/sqlite/migrations")
+	viper.SetDefault(EnvDbMigrate, true)
+
 	// Environment Defaults
 	viper.SetDefault(EnvEnvironment, "dev")
 	viper.SetDefault(EnvRegion, "local")
