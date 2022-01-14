@@ -2,46 +2,41 @@ package sqlite
 
 import (
 	"context"
+
+	"github.com/nch-bowstave/paymail/models"
 )
 
 const (
 	sqlCreateAlias = `
 		INSERT INTO aliases(paymail, user_id)
-		VALUES(:alias, :user_id)
+		VALUES(:paymail, :user_id)
 	`
 
 	sqlGetUserID = `
 		SELECT user_id
 		FROM aliases
-		WHERE paymail = :alias
+		WHERE paymail = :paymail
 	`
 )
 
 type AliasStore interface {
-	CreateAlias(ctx context.Context, alias string, userID uint64) error
+	CreateAlias(ctx context.Context, a *models.AliasDetails) error
 	GetUserID(ctx context.Context, alias string) (uint64, error)
 }
 
-func (s *sqliteStore) CreateAlias(ctx context.Context, alias string, userID uint64) error {
-	args := &struct {
-		Alias  string `db:"alias"`
-		UserID uint64 `db:"user_id"`
-	}{
-		Alias:  alias,
-		UserID: userID,
-	}
-	_, err := s.db.NamedExec(sqlCreateAlias, args)
+func (s *sqliteStore) CreateAlias(ctx context.Context, a *models.AliasDetails) error {
+	_, err := s.db.NamedExec(sqlCreateAlias, a)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (s *sqliteStore) GetUserID(ctx context.Context, alias string) (uint64, error) {
+func (s *sqliteStore) GetUserID(ctx context.Context, paymail string) (uint64, error) {
 	dest := &struct {
 		UserID uint64 `db:"user_id"`
 	}{}
-	err := s.db.GetContext(ctx, dest, sqlGetUserID, alias)
+	err := s.db.GetContext(ctx, dest, sqlGetUserID, paymail)
 	if err != nil {
 		return 0, err
 	}
