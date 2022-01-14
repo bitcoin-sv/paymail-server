@@ -6,11 +6,13 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/nch-bowstave/paymail/config"
 	"github.com/nch-bowstave/paymail/data"
 	"github.com/nch-bowstave/paymail/data/payd"
+	sql "github.com/nch-bowstave/paymail/data/sqlite"
 	"github.com/nch-bowstave/paymail/docs"
 	"github.com/nch-bowstave/paymail/log"
 	"github.com/nch-bowstave/paymail/service"
@@ -28,7 +30,7 @@ type Deps struct {
 }
 
 // SetupDeps will setup all required dependent services.
-func SetupDeps(cfg config.Config, l log.Logger) *Deps {
+func SetupDeps(cfg config.Config, l log.Logger, db *sqlx.DB) *Deps {
 	httpClient := &http.Client{Timeout: 5 * time.Second}
 	if !cfg.PayD.Secure { // for testing, don't validate server cert
 		// #nosec
@@ -39,11 +41,11 @@ func SetupDeps(cfg config.Config, l log.Logger) *Deps {
 	}
 	// stores
 	paydStore := payd.NewPayD(cfg.PayD, data.NewClient(httpClient))
-	// paymailStore := data.NewPaymail(cfg.PayD, sqlite.Store)
+	sqlLiteStore := sql.NewSQLiteStore(db)
 
 	// services
 	paymailSvc := service.NewPaymail(l)
-	pkiSvc := service.NewPki(l, paydStore)
+	pkiSvc := service.NewPki(l, paydStore, sqlLiteStore)
 	p2paymailSvc := service.NewP2Paymail(l, paydStore)
 
 	return &Deps{

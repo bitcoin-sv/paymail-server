@@ -72,7 +72,7 @@ func main() {
 	}
 
 	// setup transports
-	internal.SetupHTTPEndpoints(internal.SetupDeps(*cfg, log), e)
+	internal.SetupHTTPEndpoints(internal.SetupDeps(*cfg, log, db), e)
 
 	if cfg.Deployment.IsDev() {
 		internal.PrintDev(e)

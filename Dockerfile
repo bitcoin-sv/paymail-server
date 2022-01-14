@@ -15,10 +15,10 @@ RUN adduser \
 WORKDIR /app
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o generate -ldflags="-s -w" ./cmd/generate
-RUN CGO_ENABLED=0 GOOS=linux go build -o server -ldflags="-s -w" ./cmd/server
+RUN CGO_ENABLED=1 GOOS=linux go build -o generate -ldflags="-s -w" ./cmd/generate
+RUN CGO_ENABLED=1 GOOS=linux go build -o server -ldflags="-s -w" ./cmd/server
 
-FROM scratch
+FROM bitnami/minideb:buster
 
 COPY --from=builder /app/data/sqlite/migrations/ /migrations
 COPY --from=builder /app/generate /bin/
@@ -29,6 +29,9 @@ COPY --from=builder /etc/group /etc/group
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 
 RUN ["generate"]
+
+RUN mkdir /paydb && chown -R appuser:appuser /paydb
+VOLUME /paydb
 
 USER appuser:appuser
 
