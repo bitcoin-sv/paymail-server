@@ -10,15 +10,14 @@ import (
 
 	"github.com/libsv/go-p4"
 	"github.com/libsv/p4-server/data"
-	"github.com/libsv/p4-server/data/payd/models"
 	"github.com/libsv/payd"
 	"github.com/nch-bowstave/paymail/config"
+	"github.com/nch-bowstave/paymail/data/payd/models"
 )
 
 // Known endpoints for the payd wallet implementing the payment protocol interface.
 const (
 	urlPayments      = "%s/api/v1/payments/%s"
-	urlOwner         = "%s/api/v1/owner"
 	urlUser          = "%s/api/v1/user/%s"
 	urlCreate        = "%s/api/v1/invoices"
 	urlDestinations  = "%s/api/v1/destinations/%s"
@@ -63,15 +62,16 @@ func (p *Payd) PaymentCreate(ctx context.Context, args p4.PaymentCreateArgs, req
 //
 // In this example, the payd wallet has no auth, in proper implementations auth would
 // be enabled and a cookie / oauth / bearer token etc would be passed down.
-func (p *Payd) User(ctx context.Context, handle string) (*p4.Merchant, error) {
+func (p *Payd) User(ctx context.Context, userID uint64) (*p4.Merchant, error) {
+	uid := fmt.Sprint(userID)
 	var user *p4.Merchant
-	if err := p.client.Do(ctx, http.MethodGet, fmt.Sprintf(urlUser, p.baseURL(), handle), http.StatusOK, nil, &user); err != nil {
+	if err := p.client.Do(ctx, http.MethodGet, fmt.Sprintf(urlUser, p.baseURL(), uid), http.StatusOK, nil, &user); err != nil {
 		return nil, errors.WithStack(err)
 	}
 	return user, nil
 }
 
-func (p *Payd) CreateInvoice(ctx context.Context, req *payd.InvoiceCreate) (*payd.Invoice, error) {
+func (p *Payd) CreateInvoice(ctx context.Context, req *models.InvoiceCreate) (*payd.Invoice, error) {
 	var res payd.Invoice
 	if err := p.client.Do(ctx, http.MethodPost, fmt.Sprintf(urlCreate, p.baseURL()), http.StatusCreated, &req, &res); err != nil {
 		return nil, errors.WithStack(err)

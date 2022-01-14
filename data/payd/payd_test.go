@@ -184,7 +184,7 @@ func TestPayd_Owner(t *testing.T) {
 				},
 			})
 			// epic is just the placeholder deafult user handle for payd
-			_, err := pd.User(context.Background(), "epic")
+			_, err := pd.User(context.Background(), 1)
 			if test.expErr != nil {
 				assert.Error(t, err)
 				assert.EqualError(t, err, test.expErr.Error())

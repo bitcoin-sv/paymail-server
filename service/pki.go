@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/libsv/p4-server/log"
 	"github.com/nch-bowstave/paymail/data/payd"
@@ -35,13 +34,10 @@ type Pki interface {
 }
 
 func (svc *pki) PkiReader(ctx context.Context, paymail string) *PkiResponse {
-	p := strings.FieldsFunc(paymail, func(r rune) bool {
-		return string(r) == "@"
-	})
-	handle := p[0]
+	userID := GetUserIDFromPaymail(paymail)
 	// domain = p[1]
 	// TODO check domain matches one of our env paymail domains
-	user, err := svc.payd.User(ctx, handle)
+	user, err := svc.payd.User(ctx, userID)
 	if err != nil {
 		return &PkiResponse{
 			BsvAlias: "1.0",
