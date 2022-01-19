@@ -15,7 +15,7 @@ CREATE TABLE users(
 
 CREATE TABLE keys (
     name        VARCHAR NOT NULL
-    ,user_id     INTEGER NOT NULL PRIMARY KEY
+    ,user_id     INTEGER NOT NULL
     ,xprv       VARCHAR NOT NULL
     ,createdAt  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ,FOREIGN KEY (user_id) REFERENCES users(user_id)
@@ -85,7 +85,6 @@ CREATE TABLE destinations(
     ,created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ,updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ,deleted_at      TIMESTAMP
-    ,FOREIGN KEY (key_name) REFERENCES keys(name)
     ,FOREIGN KEY (user_id) REFERENCES users(user_id)
     ,CONSTRAINT destinations_locking_script UNIQUE(locking_script)
 );

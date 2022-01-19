@@ -1,0 +1,10 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "database": "${workspaceFolder:paymail-server}/run/regtest/payd/wallet.db",
+            "name": "e"
+        }
+    ]
+}

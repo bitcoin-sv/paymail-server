@@ -10,7 +10,6 @@ import (
 
 	"github.com/libsv/go-p4"
 	"github.com/libsv/p4-server/data"
-	"github.com/libsv/payd"
 	"github.com/nch-bowstave/paymail/config"
 	"github.com/nch-bowstave/paymail/data/payd/models"
 )
@@ -19,6 +18,7 @@ import (
 const (
 	urlPayments      = "%s/api/v1/payments/%s"
 	urlUser          = "%s/api/v1/user/%s"
+	urlUserCreate    = "%s/api/v1/user"
 	urlCreate        = "%s/api/v1/invoices"
 	urlDestinations  = "%s/api/v1/destinations/%s"
 	urlProofs        = "%s/api/v1/proofs/%s"
@@ -71,8 +71,8 @@ func (p *Payd) User(ctx context.Context, userID uint64) (*p4.Merchant, error) {
 	return user, nil
 }
 
-func (p *Payd) CreateInvoice(ctx context.Context, req *models.InvoiceCreate) (*payd.Invoice, error) {
-	var res payd.Invoice
+func (p *Payd) CreateInvoice(ctx context.Context, req *models.InvoiceCreate) (*models.Invoice, error) {
+	var res models.Invoice
 	if err := p.client.Do(ctx, http.MethodPost, fmt.Sprintf(urlCreate, p.baseURL()), http.StatusCreated, &req, &res); err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -113,4 +113,12 @@ func (p *Payd) baseURL() string {
 		return fmt.Sprintf("%s://%s%s", protocolSecure, p.cfg.Host, p.cfg.Port)
 	}
 	return fmt.Sprintf("%s://%s%s", protocolInsecure, p.cfg.Host, p.cfg.Port)
+}
+
+func (p *Payd) CreateUser(ctx context.Context, req models.UserDetails) (*models.User, error) {
+	var user *models.User
+	if err := p.client.Do(ctx, http.MethodPost, fmt.Sprintf(urlUser, p.baseURL()), http.StatusOK, &req, &user); err != nil {
+		return nil, errors.WithStack(err)
+	}
+	return user, nil
 }

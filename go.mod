@@ -25,8 +25,8 @@ require (
 require (
 	github.com/golang-migrate/migrate/v4 v4.15.1
 	github.com/jmoiron/sqlx v1.3.4
-	github.com/libsv/payd v0.1.2
 	github.com/mattn/go-sqlite3 v1.14.10
+	gopkg.in/guregu/null.v3 v3.5.0
 )
 
 require (
@@ -78,7 +78,6 @@ require (
 	golang.org/x/time v0.0.0-20201208040808-7e3f01d25324 // indirect
 	golang.org/x/tools v0.1.7 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
-	gopkg.in/guregu/null.v3 v3.5.0 // indirect
 	gopkg.in/ini.v1 v1.66.2 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )

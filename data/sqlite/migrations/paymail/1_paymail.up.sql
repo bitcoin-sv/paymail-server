@@ -7,7 +7,3 @@ CREATE TABLE aliases (
 INSERT INTO 
     aliases(paymail, user_id)
     VALUES("epic@nchain.com", 1);
-
-INSERT INTO 
-    aliases(paymail, user_id)
-    VALUES("off@nchain.com", 2);

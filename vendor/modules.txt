@@ -117,13 +117,9 @@ github.com/libsv/go-p4/mocks
 github.com/libsv/p4-server
 github.com/libsv/p4-server/config
 github.com/libsv/p4-server/data
-github.com/libsv/p4-server/data/payd/models
 github.com/libsv/p4-server/log
 github.com/libsv/p4-server/service
 github.com/libsv/p4-server/transports/http/middleware
-# github.com/libsv/payd v0.1.2
-## explicit; go 1.17
-github.com/libsv/payd
 # github.com/magiconair/properties v1.8.5
 ## explicit; go 1.13
 github.com/magiconair/properties
