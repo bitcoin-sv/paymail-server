@@ -51,6 +51,7 @@ func main() {
 		WithDeployment(appname).
 		WithLog().
 		WithPayD().
+		WithP4().
 		WithTransports().
 		Load()
 	log := log.NewZero(cfg.Logging)

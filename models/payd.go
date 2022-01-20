@@ -33,6 +33,11 @@ type DestinationResponse struct {
 	ExpiresAt   time.Time     `json:"expiresAt"`
 }
 
+// InvoiceArgs contains argument/s to return a single invoice.
+type InvoiceArgs struct {
+	InvoiceID string `param:"invoiceID" db:"invoice_id"`
+}
+
 // User information on wallet users.
 type User struct {
 	ID           uint64                 `json:"id" db:"user_id"`

@@ -12,8 +12,8 @@ import (
 	"github.com/libsv/go-p4"
 	"github.com/nch-bowstave/paymail/config"
 	"github.com/nch-bowstave/paymail/data/payd"
-	"github.com/nch-bowstave/paymail/data/payd/models"
 	"github.com/nch-bowstave/paymail/mocks"
+	"github.com/nch-bowstave/paymail/models"
 	"github.com/stretchr/testify/assert"
 )
 

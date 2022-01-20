@@ -3,7 +3,7 @@
         {
             "previewLimit": 50,
             "driver": "SQLite",
-            "name": "fvdas`",
+            "name": "srde",
             "database": "${workspaceFolder:paymail-server}/run/regtest/payd/wallet.db"
         }
     ]

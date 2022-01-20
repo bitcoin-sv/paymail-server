@@ -39,6 +39,10 @@ func SetupDefaults() {
 	viper.SetDefault(EnvPaydSecure, false)
 	viper.SetDefault(EnvPaydNoop, false)
 
+	// p4
+	viper.SetDefault(EnvP4Timeout, 30)
+	viper.SetDefault(EnvP4Host, "p4:8445")
+
 	// Socket settings
 	viper.SetDefault(EnvSocketChannelTimeoutSeconds, 7200*time.Second) // 2 hrs in seconds
 	viper.SetDefault(EnvSocketMaxMessageBytes, 10000)

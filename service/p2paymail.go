@@ -2,12 +2,14 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/libsv/go-bt/v2"
 	"github.com/libsv/go-p4"
 	"github.com/libsv/p4-server/log"
+	data "github.com/nch-bowstave/paymail/data/p4"
 	paydData "github.com/nch-bowstave/paymail/data/payd"
-	"github.com/nch-bowstave/paymail/data/payd/models"
+	"github.com/nch-bowstave/paymail/models"
 )
 
 // ref: https://docs.moneybutton.com/docs/paymail/paymail-06-p2p-transactions.html
@@ -50,6 +52,7 @@ type TxReceipt struct {
 type p2Paymail struct {
 	l    log.Logger
 	payd *paydData.Payd
+	p4   data.P4
 }
 
 // GetUserIDFromPaymail
@@ -59,10 +62,11 @@ func GetUserIDFromPaymail(paymail string) uint64 {
 }
 
 // NewPaymail will create and return a new paymail service.
-func NewP2Paymail(l log.Logger, payd *paydData.Payd) *p2Paymail {
+func NewP2Paymail(l log.Logger, payd *paydData.Payd, p4Client data.P4) *p2Paymail {
 	return &p2Paymail{
 		l:    l,
 		payd: payd,
+		p4:   p4Client,
 	}
 }
 
@@ -85,16 +89,17 @@ func (svc *p2Paymail) Destinations(ctx context.Context, paymail string, args Des
 		return nil, err
 	}
 
-	// grab some destinations from PayD
-	response, err := svc.payd.Destinations(ctx, p4.PaymentRequestArgs{
-		PaymentID: invoice.ID,
-	})
+	destReq := models.P4PayRequest{
+		PayToURL: fmt.Sprintf("http://%s/api/v1/payment/%s", svc.p4.Host(), invoice.ID),
+	}
+	// grab some destinations from P4
+	response, err := svc.p4.PaymentRequest(ctx, destReq)
 	if err != nil {
 		return nil, err
 	}
 
 	var outputs []Output
-	for _, output := range response.Outputs {
+	for _, output := range response.Destinations.Outputs {
 		outputs = append(outputs, Output{
 			Script:   output.Script,
 			Satoshis: output.Amount,

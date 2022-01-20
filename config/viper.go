@@ -74,6 +74,15 @@ func (v *ViperConfig) WithPayD() ConfigurationLoader {
 	return v
 }
 
+// WithP4 sets up and return p4 interface configuration.
+func (v *ViperConfig) WithP4() ConfigurationLoader {
+	v.P4 = &P4{
+		ServerHost: viper.GetString(EnvP4Host),
+		Timeout:    viper.GetInt(EnvP4Timeout),
+	}
+	return v
+}
+
 func (v *ViperConfig) WithPaymail() ConfigurationLoader {
 	v.Paymail = &Paymail{
 		Root: viper.GetString(EnvPaymailRoot),

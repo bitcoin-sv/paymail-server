@@ -11,7 +11,7 @@ import (
 	"github.com/libsv/go-p4"
 	"github.com/libsv/p4-server/data"
 	"github.com/nch-bowstave/paymail/config"
-	"github.com/nch-bowstave/paymail/data/payd/models"
+	"github.com/nch-bowstave/paymail/models"
 )
 
 // Known endpoints for the payd wallet implementing the payment protocol interface.
