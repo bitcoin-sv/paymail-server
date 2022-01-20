@@ -35,7 +35,7 @@ func (p *p4Client) Host() string {
 // PaymentRequest performs a payment request http request to the specified url.
 func (p *p4Client) PaymentRequest(ctx context.Context, args models.P4PayRequest) (*models.PaymentRequest, error) {
 	var resp models.PaymentRequest
-	err := p.c.Do(ctx, http.MethodGet, args.PayToURL, http.StatusAccepted, nil, &resp)
+	err := p.c.Do(ctx, http.MethodGet, args.PayToURL, http.StatusOK, nil, &resp)
 	if err != nil {
 		return nil, err
 	}
