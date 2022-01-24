@@ -6,10 +6,10 @@ import (
 )
 
 func main() {
-	// manually load prefix to endpoints if required
+	// cfg := config.NewViperConfig("paymail").WithPaymail().Load() // not sure why this isn't working.
 	cfg := &config.Config{
 		Paymail: &config.Paymail{
-			Root: "http://localhost:8446",
+			Root: "https://paymail.carefulbear.com",
 		},
 	}
 	// generate a static capabilities document based on the files in data/capabilities.

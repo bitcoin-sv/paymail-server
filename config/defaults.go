@@ -39,6 +39,9 @@ func SetupDefaults() {
 	viper.SetDefault(EnvPaydSecure, false)
 	viper.SetDefault(EnvPaydNoop, false)
 
+	// paymail
+	viper.SetDefault(EnvPaymailRoot, "https://paymail.carefulbear.com")
+
 	// p4
 	viper.SetDefault(EnvP4Timeout, 30)
 	viper.SetDefault(EnvP4Host, "p4:8445")

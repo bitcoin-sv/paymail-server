@@ -9,7 +9,7 @@ services:
       DB_SCHEMA_PATH: "migrations/paymail"
       DB_TYPE: "sqlite"
       DOMAIN_TLD: "nchain.com"
-      PAYMAIL_DOMAIN: "localhost"
+      PAYMAIL_ROOT: "http://localhost:8446"
       PAYMAIL_HOST: "paymail"
       PAYMAIL_PORT: "8446"
       LOG_LEVEL: "debug"
