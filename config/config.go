@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"regexp"
 	"time"
 )
 
@@ -86,8 +85,6 @@ const (
 	DBMySQL    DbType = "mysql"
 	DBPostgres DbType = "postgres"
 )
-
-var reDbType = regexp.MustCompile(`sqlite|mysql|postgres`)
 
 // IsDev determines if this app is running on a dev environment.
 func (d *Deployment) IsDev() bool {

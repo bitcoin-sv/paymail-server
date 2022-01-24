@@ -117,7 +117,7 @@ func (p *Payd) baseURL() string {
 
 func (p *Payd) CreateUser(ctx context.Context, req models.UserDetails) (*models.User, error) {
 	var user *models.User
-	if err := p.client.Do(ctx, http.MethodPost, fmt.Sprintf(urlUser, p.baseURL()), http.StatusOK, &req, &user); err != nil {
+	if err := p.client.Do(ctx, http.MethodPost, fmt.Sprintf(urlUserCreate, p.baseURL()), http.StatusOK, &req, &user); err != nil {
 		return nil, errors.WithStack(err)
 	}
 	return user, nil

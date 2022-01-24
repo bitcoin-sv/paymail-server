@@ -20,11 +20,11 @@ const (
 )
 
 type AliasStore interface {
-	CreateAlias(ctx context.Context, a *models.AliasDetails) error
+	CreateAlias(ctx context.Context, a *models.AliasResponse) error
 	GetUserID(ctx context.Context, alias string) (uint64, error)
 }
 
-func (s *sqliteStore) CreateAlias(ctx context.Context, a *models.AliasDetails) error {
+func (s *sqliteStore) CreateAlias(ctx context.Context, a *models.AliasResponse) error {
 	_, err := s.db.NamedExec(sqlCreateAlias, a)
 	if err != nil {
 		return err

@@ -19,64 +19,6 @@ func NewSQLiteStore(db *sqlx.DB) *sqliteStore {
 	return &sqliteStore{db: db}
 }
 
-func (s *sqliteStore) newTx(ctx context.Context) (*sqlx.Tx, error) {
-	ctxx := TxFromContext(ctx)
-	if ctxx != nil {
-		if ctxx.Tx == nil {
-			t, err := s.db.BeginTxx(ctx, nil)
-			if err != nil {
-				return nil, err
-			}
-			ctxx.Tx = t
-		}
-		return ctxx.Tx, nil
-	}
-	return s.db.BeginTxx(ctx, nil)
-}
-
-// commit a transaction, if there is a context based tx
-// this will not commit - we wait on the context to close it.
-func commit(ctx context.Context, tx *sqlx.Tx) error {
-	ctxx := TxFromContext(ctx)
-	if ctxx != nil {
-		if ctxx.Tx != nil {
-			return nil
-		}
-	}
-	return tx.Commit()
-}
-
-// rollback a transaction, if there is a context based tx
-// this will not rollback - we wait on the context to close it.
-func rollback(ctx context.Context, tx *sqlx.Tx) error {
-	ctxx := TxFromContext(ctx)
-	if ctxx != nil {
-		if ctxx.Tx != nil {
-			return nil
-		}
-	}
-	return tx.Rollback()
-}
-
-func handleNamedExec(tx db, sql string, args interface{}) error {
-	res, err := tx.NamedExec(sql, args)
-	if err != nil {
-		return errors.Wrap(err, "failed to run exec")
-	}
-	return handleExecRows(res)
-}
-
-func handleExecRows(res sql.Result) error {
-	ra, err := res.RowsAffected()
-	if err != nil {
-		return errors.Wrap(err, "failed to read rows affected")
-	}
-	if ra <= 0 {
-		return errors.Wrap(err, "exec did not affect rows")
-	}
-	return nil
-}
-
 // nolint:deadcode,unused // wip
 func dbErr(err error, errCode, message string) error {
 	if err == nil {
@@ -97,13 +39,6 @@ func dbErrf(err error, errCode, format string, args ...interface{}) error {
 		return lathos.NewErrNotFound(errCode, fmt.Sprintf(format, args...))
 	}
 	return errors.WithMessage(err, fmt.Sprintf(format, args...))
-}
-
-type db interface {
-	NamedExec(query string, arg interface{}) (sql.Result, error)
-	Get(dest interface{}, query string, args ...interface{}) error
-	GetContext(ctx context.Context, dest interface{}, query string, args ...interface{}) error
-	Select(dest interface{}, query string, args ...interface{}) error
 }
 
 type execKey int

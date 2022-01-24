@@ -28,7 +28,7 @@ func (h *aliasHandler) RegisterRoutes(g *echo.Group) {
 
 // aliasCreate generates a response object by forwarding the paymail to the aliasReader.
 func (h *aliasHandler) aliasCreate(e echo.Context) error {
-	var args models.AliasDetails
+	var args models.NewAliasDetails
 	if err := e.Bind(&args); err != nil {
 		return errors.WithStack(err)
 	}
