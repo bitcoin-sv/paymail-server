@@ -10,6 +10,7 @@ import (
 	"github.com/libsv/p4-server/log"
 	data "github.com/nch-bowstave/paymail/data/p4"
 	paydData "github.com/nch-bowstave/paymail/data/payd"
+	"github.com/nch-bowstave/paymail/data/sqlite"
 	"github.com/nch-bowstave/paymail/models"
 )
 
@@ -54,20 +55,16 @@ type p2Paymail struct {
 	l    log.Logger
 	payd *paydData.Payd
 	p4   data.P4
-}
-
-// GetUserIDFromPaymail
-func GetUserIDFromPaymail(paymail string) uint64 {
-	// TODO lookup the paymail in our database and return a user_id
-	return 1
+	pki  sqlite.AliasStore
 }
 
 // NewPaymail will create and return a new paymail service.
-func NewP2Paymail(l log.Logger, payd *paydData.Payd, p4Client data.P4) *p2Paymail {
+func NewP2Paymail(l log.Logger, payd *paydData.Payd, p4Client data.P4, pkiStr sqlite.AliasStore) *p2Paymail {
 	return &p2Paymail{
 		l:    l,
 		payd: payd,
 		p4:   p4Client,
+		pki:  pkiStr,
 	}
 }
 
@@ -78,7 +75,10 @@ type P2Paymail interface {
 }
 
 func (svc *p2Paymail) Destinations(ctx context.Context, paymail string, args DestArgs) (*DestResponse, error) {
-	userID := GetUserIDFromPaymail(paymail)
+	userID, err := svc.pki.GetUserID(ctx, paymail)
+	if err != nil {
+		return nil, err
+	}
 	req := &models.InvoiceCreate{
 		UserID:      userID,
 		Satoshis:    args.Satoshis,

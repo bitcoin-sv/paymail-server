@@ -1,0 +1,65 @@
+version: "3.7"
+
+services:
+  paymail:
+    container_name: paymail
+    image: deggen88/paymail
+    environment:
+      DB_DSN: "file:paydb/paymail.db?cache=shared&_foreign_keys=true"
+      DB_SCHEMA_PATH: "migrations/paymail"
+      DB_TYPE: "sqlite"
+      DOMAIN_TLD: "nchain.com"
+      PAYMAIL_DOMAIN: "localhost"
+      PAYMAIL_HOST: "paymail"
+      PAYMAIL_PORT: "8446"
+      LOG_LEVEL: "debug"
+      PAYD_HOST: "payd"
+      PAYD_PORT: ":8443"
+      TRANSPORT_MODE: "http"
+    volumes:
+      - payd-data:/paydb
+    ports:
+      - "8446:8446"
+    networks:
+      - mainnet-stack
+
+  payd:
+    container_name: payd
+    image: deggen88/payd
+    environment:
+      DB_DSN: "file:paydb/wallet.db?cache=shared&_foreign_keys=true"
+      DB_SCHEMA_PATH: "migrations"
+      LOG_LEVEL: "debug"
+      P4_HOST: "http://p4:8445"
+      MAPI_CALLBACK_HOST: "http://p4:8445"
+      TRANSPORT_MODE: "http"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "localhost:8443/api/v1/health" ]
+      interval: 30s
+      timeout: 10s
+    volumes:
+      - payd-data:/paydb
+    ports:
+      - "8443:8443"
+    networks:
+      - mainnet-stack
+
+  p4:
+    container_name: p4
+    image: deggen88/p4
+    environment:
+      LOG_LEVEL: "debug"
+      TRANSPORT_MODE: 'http'
+    ports:
+      - "8445:8445"
+    networks:
+      - mainnet-stack
+
+volumes:
+  payd-data:
+    external: false
+
+networks:
+  mainnet-stack:
+    external: false
+    name: mainnet-stack

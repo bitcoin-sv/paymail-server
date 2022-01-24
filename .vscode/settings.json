@@ -3,8 +3,14 @@
         {
             "previewLimit": 50,
             "driver": "SQLite",
-            "name": "srde",
-            "database": "${workspaceFolder:paymail-server}/run/regtest/payd/wallet.db"
+            "name": "paymail",
+            "database": "/Users/deggen/Desktop/paymail.db"
+        },
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "name": "payd",
+            "database": "/Users/deggen/Desktop/wallet.db"
         }
     ]
 }

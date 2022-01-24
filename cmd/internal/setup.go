@@ -51,7 +51,7 @@ func SetupDeps(cfg config.Config, l log.Logger, db *sqlx.DB) *Deps {
 	paymailSvc := service.NewPaymail(l)
 	pkiSvc := service.NewPki(l, paydStore, sqlLiteStore)
 	aliasSvc := service.NewAlias(l, paydStore, sqlLiteStore)
-	p2paymailSvc := service.NewP2Paymail(l, paydStore, p4Client)
+	p2paymailSvc := service.NewP2Paymail(l, paydStore, p4Client, sqlLiteStore)
 
 	return &Deps{
 		PaymailService:   paymailSvc,
