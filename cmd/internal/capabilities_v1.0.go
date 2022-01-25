@@ -30,6 +30,9 @@ func (caps *CapabilitiesDocumentV1) AddCapabilityV1(cfg *config.Config, d []byte
 		caps.Capabilities = map[string]string{}
 	}
 	caps.Capabilities[brfcID] = capability.Callback
+	if brfcID == "0f9681ab58f0" {
+		caps.Capabilities["pki"] = capability.Callback
+	}
 	return nil
 }
 
