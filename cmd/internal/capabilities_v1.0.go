@@ -11,7 +11,7 @@ import (
 
 // CapabilitiesDocument is the whole response body for the capability discovery mechanism of Paymail.
 type CapabilitiesDocumentV1 struct {
-	Version      string            `json:"version"`
+	Version      string            `json:"bsvalias"`
 	Capabilities map[string]string `json:"capabilities"`
 }
 
