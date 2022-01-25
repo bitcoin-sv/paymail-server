@@ -21,7 +21,7 @@ const (
 
 type AliasStore interface {
 	CreateAlias(ctx context.Context, a *models.AliasResponse) error
-	GetUserID(ctx context.Context, alias string) (uint64, error)
+	GetUserID(ctx context.Context, paymail string) (uint64, error)
 }
 
 func (s *sqliteStore) CreateAlias(ctx context.Context, a *models.AliasResponse) error {

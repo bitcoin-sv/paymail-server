@@ -32,5 +32,5 @@ func (h *capabilitiesHandler) capabilitiesResponse(e echo.Context) error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	return e.JSONBlob(http.StatusCreated, data)
+	return e.JSONBlob(http.StatusOK, data)
 }
