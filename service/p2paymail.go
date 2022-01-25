@@ -130,9 +130,7 @@ func (svc *p2Paymail) RawTx(ctx context.Context, args TxSubmitArgs) (*TxReceipt,
 			RawTx: args.RawTx,
 		},
 	}
-
-	fmt.Printf("|=============\n\n\n\n%+v\n\n\n\n==============|", req)
-
+	
 	// TODO storing the requests for future reference - debugging
 	// TODO check incoming signature across the TxID (use go-paymail)
 

@@ -76,7 +76,7 @@ func setup(c bn.NodeClient, h data.HTTPClient) {
 	res := service.DestResponse{}
 
 	// Grab destinations via paymail endpoint
-	err = h.Do(context.Background(), http.MethodPost, "http://localhost:8446/api/p2pDest/epic@nchain.com", http.StatusCreated, &req, &res)
+	err = h.Do(context.Background(), http.MethodPost, "http://localhost:8446/api/p2pDest/epic@nchain.com", http.StatusOK, &req, &res)
 	if err != nil {
 		panic(err)
 	}
@@ -110,7 +110,7 @@ func setup(c bn.NodeClient, h data.HTTPClient) {
 	}
 	resraw := service.TxReceipt{}
 
-	err = h.Do(context.Background(), http.MethodPost, "http://localhost:8446/api/p2pRawTx", http.StatusCreated, &reqraw, &resraw)
+	err = h.Do(context.Background(), http.MethodPost, "http://localhost:8446/api/p2pRawTx", http.StatusOK, &reqraw, &resraw)
 	if err != nil {
 		panic(err)
 	}

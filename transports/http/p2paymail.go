@@ -36,7 +36,7 @@ func (h *p2PaymailHandler) p2pDest(e echo.Context) error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	return e.JSON(http.StatusCreated, resp)
+	return e.JSON(http.StatusOK, resp)
 }
 
 // p2pTxSubmit sends the rawtx to payd which sends to chain
@@ -49,5 +49,5 @@ func (h *p2PaymailHandler) p2pTxSubmit(e echo.Context) error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	return e.JSON(http.StatusCreated, resp)
+	return e.JSON(http.StatusOK, resp)
 }
