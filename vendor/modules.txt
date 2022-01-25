@@ -84,6 +84,16 @@ github.com/libsv/go-bk/bip32
 github.com/libsv/go-bk/chaincfg
 github.com/libsv/go-bk/crypto
 github.com/libsv/go-bk/envelope
+github.com/libsv/go-bk/wif
+# github.com/libsv/go-bn v0.0.1
+## explicit; go 1.17
+github.com/libsv/go-bn
+github.com/libsv/go-bn/internal
+github.com/libsv/go-bn/internal/config
+github.com/libsv/go-bn/internal/models
+github.com/libsv/go-bn/internal/service
+github.com/libsv/go-bn/internal/util
+github.com/libsv/go-bn/models
 # github.com/libsv/go-bt/v2 v2.1.0-beta.2
 ## explicit; go 1.17
 github.com/libsv/go-bt/v2
@@ -195,6 +205,9 @@ golang.org/x/net/http2/hpack
 golang.org/x/net/idna
 golang.org/x/net/webdav
 golang.org/x/net/webdav/internal/xml
+# golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
+## explicit
+golang.org/x/sync/singleflight
 # golang.org/x/sys v0.0.0-20211210111614-af8b64212486
 ## explicit; go 1.17
 golang.org/x/sys/execabs
