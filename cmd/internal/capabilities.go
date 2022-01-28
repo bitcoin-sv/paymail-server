@@ -3,13 +3,13 @@ package internal
 import (
 	"encoding/hex"
 	"encoding/json"
-	"fmt"
 	"strings"
 
 	"github.com/libsv/go-bk/crypto"
 	"github.com/libsv/go-bt/v2"
 	"github.com/nch-bowstave/paymail/config"
 	"github.com/nch-bowstave/paymail/data"
+	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 )
 
@@ -29,14 +29,14 @@ type Capability struct {
 }
 
 // AddCapability is a function for dynamically adding capabilities from a yaml file.
-func (caps *CapabilitiesDocument) AddCapability(cfg *config.Config, d []byte) error {
+func (caps *CapabilitiesDocument) AddCapability(cfg *config.Paymail, d []byte) error {
 	capability := &Capability{}
 	err := yaml.Unmarshal(d, capability)
 	if err != nil {
 		return err
 	}
 	if cfg != nil {
-		capability.Callback = cfg.Paymail.Root + capability.Callback
+		capability.Callback = cfg.Root + capability.Callback
 	}
 	brfcID := GenerateBrfcID(capability)
 	if caps.Capabilities == nil {
@@ -65,25 +65,24 @@ func GenerateBrfcID(c *Capability) string {
 	return hex.EncodeToString(bt.ReverseBytes(crypto.Sha256d(cat)[26:]))
 }
 
-func GenerateCapabilitiesDocument(cfg *config.Config) {
+func GenerateCapabilitiesDocument(cfg *config.Paymail) error {
 	var capabilities CapabilitiesDocument
 	capabilities.Version = "2.0"
 	files, err := data.CapabilitiesData.LoadAll()
 	if err != nil {
-		panic(err)
+		return errors.Wrap(err, "failed to load capabilities")
 	}
 	for _, data := range files {
-		err = capabilities.AddCapability(cfg, data)
-		if err != nil {
-			panic(err)
+		if err = capabilities.AddCapability(cfg, data); err != nil {
+			return errors.Wrapf(err, "failed to add capability %s", string(data))
 		}
 	}
 	d, err := json.Marshal(capabilities)
 	if err != nil {
-		panic(err)
+		return errors.Wrap(err, "failed to marshal capabilities")
 	}
-	err = data.OverwriteStaticCapabilitiesFile(d)
-	if err != nil {
-		fmt.Println(err)
+	if err = data.OverwriteStaticCapabilitiesFile(d); err != nil {
+		return errors.Wrap(err, "failed to overwrite existing capabilities file")
 	}
+	return nil
 }

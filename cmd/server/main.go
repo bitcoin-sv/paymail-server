@@ -52,6 +52,7 @@ func main() {
 		WithLog().
 		WithPayD().
 		WithP4().
+		WithPaymail().
 		WithTransports().
 		Load()
 	log := log.NewZero(cfg.Logging)
@@ -59,6 +60,14 @@ func main() {
 	if err := cfg.Validate(); err != nil {
 		log.Fatal(err, "config error")
 	}
+
+	if err := internal.GenerateCapabilitiesDocument(cfg.Paymail); err != nil {
+		log.Fatal(err, "error generating capabilities document")
+	}
+	if err := internal.GenerateCapabilitiesDocumentV1(cfg.Paymail); err != nil {
+		log.Fatal(err, "error generating capabilities document v1")
+	}
+
 	db, err := databases.NewDbSetup().SetupDb(log, cfg.Db)
 	if err != nil {
 		log.Fatal(err, "failed to setup database")
