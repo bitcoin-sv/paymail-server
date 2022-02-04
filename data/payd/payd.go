@@ -17,8 +17,8 @@ import (
 // Known endpoints for the payd wallet implementing the payment protocol interface.
 const (
 	urlPayments      = "%s/api/v1/payments/%s"
-	urlUser          = "%s/api/v1/user/%s"
-	urlUserCreate    = "%s/api/v1/user"
+	urlUser          = "%s/api/v1/users/%s"
+	urlUserCreate    = "%s/api/v1/users"
 	urlCreate        = "%s/api/v1/invoices"
 	urlDestinations  = "%s/api/v1/destinations/%s"
 	urlProofs        = "%s/api/v1/proofs/%s"
@@ -117,6 +117,9 @@ func (p *Payd) baseURL() string {
 
 func (p *Payd) CreateUser(ctx context.Context, req models.UserDetails) (*models.User, error) {
 	var user *models.User
+	if req.Name == "" || req.Email == "" {
+		return nil, errors.New("Must include name and email for user registration.")
+	}
 	if err := p.client.Do(ctx, http.MethodPost, fmt.Sprintf(urlUserCreate, p.baseURL()), http.StatusOK, &req, &user); err != nil {
 		return nil, errors.WithStack(err)
 	}
