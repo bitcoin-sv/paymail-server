@@ -42,7 +42,7 @@ func (svc *alias) CreateAlias(ctx context.Context, a *models.NewAliasDetails) (*
 		PhoneNumber: a.PhoneNumber,
 	})
 	if err != nil {
-		return nil, errors.Wrap(err, "User creation failed")
+		return nil, errors.Wrap(err, "user creation failed")
 	}
 	newAlias := &models.AliasResponse{
 		UserID:  user.ID,
@@ -50,7 +50,7 @@ func (svc *alias) CreateAlias(ctx context.Context, a *models.NewAliasDetails) (*
 	}
 	err = svc.str.CreateAlias(ctx, newAlias)
 	if err != nil {
-		return nil, errors.Wrap(err, "Alias creation failed")
+		return nil, errors.Wrap(err, "alias creation failed")
 	}
 	return newAlias, nil
 }

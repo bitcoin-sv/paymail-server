@@ -118,7 +118,7 @@ func (p *Payd) baseURL() string {
 func (p *Payd) CreateUser(ctx context.Context, req models.UserDetails) (*models.User, error) {
 	var user *models.User
 	if req.Name == "" || req.Email == "" {
-		return nil, errors.New("Must include name and email for user registration.")
+		return nil, errors.New("must include name and email for user registration.")
 	}
 	if err := p.client.Do(ctx, http.MethodPost, fmt.Sprintf(urlUserCreate, p.baseURL()), http.StatusOK, &req, &user); err != nil {
 		return nil, errors.WithStack(err)
