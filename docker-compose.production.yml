@@ -1,0 +1,138 @@
+version: "3.7"
+
+services:
+  paymail:
+    container_name: paymail
+    image: deggen88/paymail
+    restart: always
+    environment:
+      DB_DSN: "file:paydb/paymail.db?cache=shared&_foreign_keys=true"
+      DB_SCHEMA_PATH: "migrations/paymail"
+      DB_TYPE: "sqlite"
+      DOMAIN_TLD: "carefulbear.com"
+      PAYMAIL_ROOT: "https://paymail.carefulbear.com"
+      PAYMAIL_HOST: "paymail"
+      PAYMAIL_PORT: "8446"
+      LOG_LEVEL: "debug"
+      PAYD_HOST: "payd"
+      PAYD_PORT: ":8443"
+      TRANSPORT_MODE: "http"
+    volumes:
+      - payd-data:/paydb
+    ports:
+      - "8446:8446"
+    networks:
+      - mainnet
+
+  payd:
+    container_name: payd
+    image: deggen88/payd
+    restart: always
+    environment:
+      DB_DSN: "file:paydb/wallet.db?cache=shared&_foreign_keys=true"
+      DB_SCHEMA_PATH: "migrations"
+      LOG_LEVEL: "debug"
+      P4_HOST: "http://p4:8445"
+      WALLET_NETWORK: "mainnet"
+      MAPI_MINERNAME: "TAAL"
+      MAPI_MINERURL: "https://mapi.taal.com"
+      MAPI_TOKEN: "mainnet_4c64b811647e331e46a5c62928fa691e"
+      MAPI_CALLBACK_HOST: "https://paymail.carefulbear.com/mapi"
+      TRANSPORT_MODE: "http"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "localhost:8443/api/v1/health" ]
+      interval: 30s
+      timeout: 10s
+    volumes:
+      - payd-data:/paydb
+    ports:
+      - "8443:8443"
+    networks:
+      - mainnet
+
+  p4:
+    container_name: p4
+    image: deggen88/p4
+    restart: always
+    environment:
+      LOG_LEVEL: "debug"
+      TRANSPORT_MODE: "http"
+    ports:
+      - "8445:8445"
+    networks:
+      - mainnet
+
+  test_paymail:
+    container_name: test_paymail
+    image: deggen88/paymail
+    restart: always
+    environment:
+      DB_DSN: "file:paydb/paymail.db?cache=shared&_foreign_keys=true"
+      DB_SCHEMA_PATH: "migrations/paymail"
+      DB_TYPE: "sqlite"
+      DOMAIN_TLD: "carefulbear.com"
+      PAYMAIL_ROOT: "https://paymail.carefulbear.com/testnet/"
+      PAYMAIL_HOST: "paymail"
+      PAYMAIL_PORT: "28446"
+      LOG_LEVEL: "debug"
+      PAYD_HOST: "payd"
+      PAYD_PORT: ":28443"
+      TRANSPORT_MODE: "http"
+    volumes:
+      - test_payd-data:/paydb
+    ports:
+      - "28446:28446"
+    networks:
+      - tesnet
+
+  test_payd:
+    container_name: test_payd
+    image: deggen88/payd
+    restart: always
+    environment:
+      DB_DSN: "file:paydb/wallet.db?cache=shared&_foreign_keys=true"
+      DB_SCHEMA_PATH: "migrations"
+      LOG_LEVEL: "debug"
+      P4_HOST: "http://p4:8445"
+      WALLET_NETWORK: "testnet"
+      MAPI_MINERNAME: "TAAL"
+      MAPI_MINERURL: "https://mapi.taal.com"
+      MAPI_TOKEN: "testnet_fe512c5344dd35a1d2e756f44b920018"
+      MAPI_CALLBACK_HOST: "https://paymail.carefulbear.com/mapi"
+      TRANSPORT_MODE: "http"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "localhost:28443/api/v1/health" ]
+      interval: 30s
+      timeout: 10s
+    volumes:
+      - test_payd-data:/paydb
+    ports:
+      - "28443:28443"
+    networks:
+      - testnet
+
+  test_p4:
+    container_name: test_p4
+    image: deggen88/p4
+    restart: always
+    environment:
+      LOG_LEVEL: "debug"
+      TRANSPORT_MODE: "http"
+    ports:
+      - "28445:28445"
+    networks:
+      - mainnet
+
+volumes:
+  payd-data:
+    external: false
+  test_payd-data:
+    external: false
+
+networks:
+  mainnet:
+    external: true
+    name: mainnet
+  testnet:
+    external: true
+    name: testnet

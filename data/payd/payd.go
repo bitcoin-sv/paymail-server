@@ -20,6 +20,7 @@ const (
 	urlUser          = "%s/api/v1/users/%s"
 	urlUserCreate    = "%s/api/v1/users"
 	urlCreate        = "%s/api/v1/invoices"
+	urlGet           = "%s/api/v1/invoices/%s"
 	urlDestinations  = "%s/api/v1/destinations/%s"
 	urlProofs        = "%s/api/v1/proofs/%s"
 	protocolInsecure = "http"
@@ -69,6 +70,14 @@ func (p *Payd) User(ctx context.Context, userID uint64) (*p4.Merchant, error) {
 		return nil, errors.WithStack(err)
 	}
 	return user, nil
+}
+
+func (p *Payd) GetInvoiceByID(ctx context.Context, id string) (*models.Invoice, error) {
+	var res models.Invoice
+	if err := p.client.Do(ctx, http.MethodGet, fmt.Sprintf(urlGet, p.baseURL(), id), http.StatusOK, nil, &res); err != nil {
+		return nil, errors.WithStack(err)
+	}
+	return &res, nil
 }
 
 func (p *Payd) CreateInvoice(ctx context.Context, req *models.InvoiceCreate) (*models.Invoice, error) {
