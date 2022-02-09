@@ -116,9 +116,12 @@ func (svc *p2Paymail) Destinations(ctx context.Context, paymail string, args Des
 
 func (svc *p2Paymail) RawTx(ctx context.Context, args TxSubmitArgs) (*TxReceipt, error) {
 	pcArgs := p4.PaymentCreateArgs{PaymentID: args.Reference}
-	_, err := svc.payd.GetInvoiceByID(ctx, args.Reference)
+	invoice, err := svc.payd.GetInvoiceByID(ctx, args.Reference)
 	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("cannot pay invoice which does not exist %s", args.Reference))
+		return nil, errors.Wrap(err, fmt.Sprintf("invoice either doesn't exist or has been deleted %s", args.Reference))
+	}
+	if invoice.State == models.StateInvoiceDeleted {
+		return nil, errors.New(fmt.Sprintf("invoice either doesn't exist or has been deleted %s", args.Reference))
 	}
 	req := p4.Payment{
 		MerchantData: p4.Merchant{
