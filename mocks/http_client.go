@@ -5,7 +5,8 @@ package mocks
 
 import (
 	"context"
-	"github.com/libsv/p4-server/data"
+	"github.com/nch-bowstave/paymail/data"
+	"net/http"
 	"sync"
 )
 
@@ -19,7 +20,7 @@ var _ data.HTTPClient = &HTTPClientMock{}
 //
 // 		// make and configure a mocked data.HTTPClient
 // 		mockedHTTPClient := &HTTPClientMock{
-// 			DoFunc: func(ctx context.Context, method string, endpoint string, expStatus int, req interface{}, out interface{}) error {
+// 			DoFunc: func(ctx context.Context, method string, endpoint string, expStatus int, hdrs http.Header, req interface{}, out interface{}) error {
 // 				panic("mock out the Do method")
 // 			},
 // 		}
@@ -30,7 +31,7 @@ var _ data.HTTPClient = &HTTPClientMock{}
 // 	}
 type HTTPClientMock struct {
 	// DoFunc mocks the Do method.
-	DoFunc func(ctx context.Context, method string, endpoint string, expStatus int, req interface{}, out interface{}) error
+	DoFunc func(ctx context.Context, method string, endpoint string, expStatus int, hdrs http.Header, req interface{}, out interface{}) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -44,6 +45,8 @@ type HTTPClientMock struct {
 			Endpoint string
 			// ExpStatus is the expStatus argument value.
 			ExpStatus int
+			// Hdrs is the hdrs argument value.
+			Hdrs http.Header
 			// Req is the req argument value.
 			Req interface{}
 			// Out is the out argument value.
@@ -54,7 +57,7 @@ type HTTPClientMock struct {
 }
 
 // Do calls DoFunc.
-func (mock *HTTPClientMock) Do(ctx context.Context, method string, endpoint string, expStatus int, req interface{}, out interface{}) error {
+func (mock *HTTPClientMock) Do(ctx context.Context, method string, endpoint string, expStatus int, hdrs http.Header, req interface{}, out interface{}) error {
 	if mock.DoFunc == nil {
 		panic("HTTPClientMock.DoFunc: method is nil but HTTPClient.Do was just called")
 	}
@@ -63,6 +66,7 @@ func (mock *HTTPClientMock) Do(ctx context.Context, method string, endpoint stri
 		Method    string
 		Endpoint  string
 		ExpStatus int
+		Hdrs      http.Header
 		Req       interface{}
 		Out       interface{}
 	}{
@@ -70,13 +74,14 @@ func (mock *HTTPClientMock) Do(ctx context.Context, method string, endpoint stri
 		Method:    method,
 		Endpoint:  endpoint,
 		ExpStatus: expStatus,
+		Hdrs:      hdrs,
 		Req:       req,
 		Out:       out,
 	}
 	mock.lockDo.Lock()
 	mock.calls.Do = append(mock.calls.Do, callInfo)
 	mock.lockDo.Unlock()
-	return mock.DoFunc(ctx, method, endpoint, expStatus, req, out)
+	return mock.DoFunc(ctx, method, endpoint, expStatus, hdrs, req, out)
 }
 
 // DoCalls gets all the calls that were made to Do.
@@ -87,6 +92,7 @@ func (mock *HTTPClientMock) DoCalls() []struct {
 	Method    string
 	Endpoint  string
 	ExpStatus int
+	Hdrs      http.Header
 	Req       interface{}
 	Out       interface{}
 } {
@@ -95,6 +101,7 @@ func (mock *HTTPClientMock) DoCalls() []struct {
 		Method    string
 		Endpoint  string
 		ExpStatus int
+		Hdrs      http.Header
 		Req       interface{}
 		Out       interface{}
 	}

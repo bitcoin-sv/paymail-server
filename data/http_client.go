@@ -17,7 +17,7 @@ import (
 // HTTPClient defines a simple interface to execute an http request and map the request and response objects.
 type HTTPClient interface {
 	// Do will execute an http request.
-	Do(ctx context.Context, method, endpoint string, expStatus int, req interface{}, out interface{}) error
+	Do(ctx context.Context, method, endpoint string, expStatus int, hdrs http.Header, req interface{}, out interface{}) error
 }
 
 type client struct {
@@ -34,7 +34,7 @@ func NewClient(c *http.Client) *client {
 // Do will execute an http request and validate the status matches expStatus.
 //
 // if req is empty no request body will be added, if out is empty, the response will not be mapped.
-func (c *client) Do(ctx context.Context, method, endpoint string, expStatus int, req interface{}, out interface{}) error {
+func (c *client) Do(ctx context.Context, method, endpoint string, expStatus int, hdrs http.Header, req interface{}, out interface{}) error {
 	rdr := &bytes.Buffer{}
 	if req != nil {
 		if err := json.NewEncoder(rdr).Encode(req); err != nil {
@@ -44,6 +44,9 @@ func (c *client) Do(ctx context.Context, method, endpoint string, expStatus int,
 	httpReq, err := http.NewRequestWithContext(ctx, method, endpoint, rdr)
 	if err != nil {
 		return errors.Wrapf(err, "failed to create http request for '%s' '%s'", method, endpoint)
+	}
+	if hdrs != nil {
+		httpReq.Header = hdrs
 	}
 	httpReq.Header.Add("Content-Type", "application/json")
 

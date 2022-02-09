@@ -110,7 +110,7 @@ type InvoiceCreate struct {
 	// SPVRequired if true will mean this invoice requires a valid spvenvelope otherwise a rawTX will suffice.
 	SPVRequired bool `json:"-" db:"spv_required"`
 	// UserID should optionally address a particular user in the payd database which this invoice ought to be associated with.
-	UserID uint64 `json:"user_id,omitempty" db:"user_id,omitempty"`
+	UserID uint64 `json:"-" db:"user_id,omitempty"`
 }
 
 // InvoiceState enforces invoice states.

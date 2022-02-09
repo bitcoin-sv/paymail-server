@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/nch-bowstave/paymail/config"
+	"github.com/nch-bowstave/paymail/data"
 	"github.com/nch-bowstave/paymail/models"
 )
 
@@ -16,12 +17,12 @@ type P4 interface {
 }
 
 type p4Client struct {
-	c    HTTPClient
+	c    data.HTTPClient
 	host *config.P4
 }
 
 // NewP4 returns a new p4 interface.
-func NewP4(cfg *config.P4, c HTTPClient) P4 {
+func NewP4(cfg *config.P4, c data.HTTPClient) P4 {
 	return &p4Client{
 		c:    c,
 		host: cfg,
@@ -35,7 +36,7 @@ func (p *p4Client) Host() string {
 // PaymentRequest performs a payment request http request to the specified url.
 func (p *p4Client) PaymentRequest(ctx context.Context, args models.P4PayRequest) (*models.PaymentRequest, error) {
 	var resp models.PaymentRequest
-	err := p.c.Do(ctx, http.MethodGet, args.PayToURL, http.StatusOK, nil, &resp)
+	err := p.c.Do(ctx, http.MethodGet, args.PayToURL, http.StatusOK, nil, nil, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +46,7 @@ func (p *p4Client) PaymentRequest(ctx context.Context, args models.P4PayRequest)
 // PaymentSend sends a payment http request to the specified url, with the provided payment packet.
 func (p *p4Client) PaymentSend(ctx context.Context, args models.P4PayRequest, req models.Payment) (*models.PaymentACK, error) {
 	var resp models.PaymentACK
-	err := p.c.Do(ctx, http.MethodPost, args.PayToURL, http.StatusAccepted, &req, &resp)
+	err := p.c.Do(ctx, http.MethodPost, args.PayToURL, http.StatusAccepted, nil, &req, &resp)
 	if err != nil {
 		return nil, err
 	}
