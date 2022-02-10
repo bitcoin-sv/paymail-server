@@ -37,7 +37,7 @@ services:
       MAPI_MINERNAME: "TAAL"
       MAPI_MINERURL: "https://mapi.taal.com"
       MAPI_TOKEN: "mainnet_4c64b811647e331e46a5c62928fa691e"
-      MAPI_CALLBACK_HOST: "https://paymail.carefulbear.com/mapi"
+      MAPI_CALLBACK_HOST: "https://paymail.carefulbear.com/p4"
       TRANSPORT_MODE: "http"
     healthcheck:
       test: [ "CMD", "curl", "-f", "localhost:8443/api/v1/health" ]
@@ -83,7 +83,7 @@ services:
     ports:
       - "28446:28446"
     networks:
-      - tesnet
+      - testnet
 
   test_payd:
     container_name: test_payd
@@ -98,7 +98,7 @@ services:
       MAPI_MINERNAME: "TAAL"
       MAPI_MINERURL: "https://mapi.taal.com"
       MAPI_TOKEN: "testnet_fe512c5344dd35a1d2e756f44b920018"
-      MAPI_CALLBACK_HOST: "https://paymail.carefulbear.com/mapi"
+      MAPI_CALLBACK_HOST: "https://paymail.carefulbear.com/testnet/p4"
       TRANSPORT_MODE: "http"
     healthcheck:
       test: [ "CMD", "curl", "-f", "localhost:28443/api/v1/health" ]
@@ -121,7 +121,7 @@ services:
     ports:
       - "28445:28445"
     networks:
-      - mainnet
+      - testnet
 
 volumes:
   payd-data:
