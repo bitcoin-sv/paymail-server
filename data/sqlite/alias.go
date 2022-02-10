@@ -2,6 +2,7 @@ package sqlite
 
 import (
 	"context"
+	"errors"
 
 	"github.com/nch-bowstave/paymail/models"
 )
@@ -25,6 +26,9 @@ type AliasStore interface {
 }
 
 func (s *sqliteStore) CreateAlias(ctx context.Context, a *models.AliasResponse) error {
+	if a.Paymail == "" || a.UserID == 0 {
+		return errors.New("must include paymail and user_id to assign")
+	}
 	_, err := s.db.NamedExec(sqlCreateAlias, a)
 	if err != nil {
 		return err

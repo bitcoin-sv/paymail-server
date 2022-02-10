@@ -12,6 +12,7 @@ import (
 	paydData "github.com/nch-bowstave/paymail/data/payd"
 	"github.com/nch-bowstave/paymail/data/sqlite"
 	"github.com/nch-bowstave/paymail/models"
+	"github.com/pkg/errors"
 )
 
 // ref: https://docs.moneybutton.com/docs/paymail/paymail-06-p2p-transactions.html
@@ -115,6 +116,13 @@ func (svc *p2Paymail) Destinations(ctx context.Context, paymail string, args Des
 
 func (svc *p2Paymail) RawTx(ctx context.Context, args TxSubmitArgs) (*TxReceipt, error) {
 	pcArgs := p4.PaymentCreateArgs{PaymentID: args.Reference}
+	invoice, err := svc.payd.GetInvoiceByID(ctx, args.Reference)
+	if err != nil {
+		return nil, errors.Wrap(err, fmt.Sprintf("invoice either doesn't exist or has been deleted %s", args.Reference))
+	}
+	if invoice.State == models.StateInvoiceDeleted {
+		return nil, errors.New(fmt.Sprintf("invoice either doesn't exist or has been deleted %s", args.Reference))
+	}
 	req := p4.Payment{
 		MerchantData: p4.Merchant{
 			Name: args.MetaData.Signature,
@@ -130,7 +138,7 @@ func (svc *p2Paymail) RawTx(ctx context.Context, args TxSubmitArgs) (*TxReceipt,
 			RawTx: args.RawTx,
 		},
 	}
-	
+
 	// TODO storing the requests for future reference - debugging
 	// TODO check incoming signature across the TxID (use go-paymail)
 

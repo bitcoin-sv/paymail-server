@@ -32,6 +32,11 @@ func (h *aliasHandler) aliasCreate(e echo.Context) error {
 	if err := e.Bind(&args); err != nil {
 		return errors.WithStack(err)
 	}
-	resp := h.svc.CreateAlias(e.Request().Context(), &args)
+	resp, err := h.svc.CreateAlias(e.Request().Context(), &args)
+	if err != nil {
+		return e.JSON(http.StatusBadRequest, &models.AliasResponse{
+			Error: err.Error(),
+		})
+	}
 	return e.JSON(http.StatusAccepted, resp)
 }

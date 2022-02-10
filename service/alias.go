@@ -27,10 +27,13 @@ func NewAlias(l log.Logger, payd *payd.Payd, str sqlite.AliasStore) *alias {
 
 // Paymail contains the handlers for paymail service endpoints.
 type Alias interface {
-	CreateAlias(ctx context.Context, a *models.NewAliasDetails) *models.AliasResponse
+	CreateAlias(ctx context.Context, a *models.NewAliasDetails) (*models.AliasResponse, error)
 }
 
-func (svc *alias) CreateAlias(ctx context.Context, a *models.NewAliasDetails) *models.AliasResponse {
+func (svc *alias) CreateAlias(ctx context.Context, a *models.NewAliasDetails) (*models.AliasResponse, error) {
+	if a.Paymail == "" {
+		return nil, errors.New("must include paymail to assign")
+	}
 	user, err := svc.payd.CreateUser(ctx, models.UserDetails{
 		Name:        a.Name,
 		Email:       a.Email,
@@ -39,9 +42,7 @@ func (svc *alias) CreateAlias(ctx context.Context, a *models.NewAliasDetails) *m
 		PhoneNumber: a.PhoneNumber,
 	})
 	if err != nil {
-		return &models.AliasResponse{
-			Error: errors.Wrap(err, "User creation failed"),
-		}
+		return nil, errors.Wrap(err, "user creation failed")
 	}
 	newAlias := &models.AliasResponse{
 		UserID:  user.ID,
@@ -49,9 +50,7 @@ func (svc *alias) CreateAlias(ctx context.Context, a *models.NewAliasDetails) *m
 	}
 	err = svc.str.CreateAlias(ctx, newAlias)
 	if err != nil {
-		return &models.AliasResponse{
-			Error: errors.Wrap(err, "Alias creation failed"),
-		}
+		return nil, errors.Wrap(err, "alias creation failed")
 	}
-	return newAlias
+	return newAlias, nil
 }

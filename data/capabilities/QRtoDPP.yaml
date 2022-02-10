@@ -1,0 +1,10 @@
+title: QR to DPP resolution
+authors:
+  - Jad (nChain)
+  - Kapil (nChain)
+  - Tigh (nChain)
+  - Mark (nChain)
+  - Deggen (nChain)
+version: 1.0
+callback: /p4/api/v1/payment/{paymentID}
+readme: https://libsv.github.io/
