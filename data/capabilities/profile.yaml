@@ -1,0 +1,6 @@
+title: Public Profile (Name & Avatar)
+authors:
+  - Ryan X. Charles (Money Button)
+version: 1
+callback: /api/profile/{alias}@{domain.tld}
+readme: https://github.com/bitcoin-sv-specs/brfc-paymail/pull/7/files#diff-06e938ac4c6e768dc1e1a00ec9756608637381cf47c95456ace986bed4d51872

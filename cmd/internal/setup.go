@@ -27,6 +27,7 @@ import (
 type Deps struct {
 	PaymailService   service.Paymail
 	PkiService       service.Pki
+	ProfileService   service.Profile
 	AliasService     service.Alias
 	P2PaymailService service.P2Paymail
 }
@@ -50,12 +51,14 @@ func SetupDeps(cfg config.Config, l log.Logger, db *sqlx.DB) *Deps {
 	// services
 	paymailSvc := service.NewPaymail(l)
 	pkiSvc := service.NewPki(l, paydStore, sqlLiteStore)
+	profileSvc := service.NewProfile(l, paydStore, sqlLiteStore)
 	aliasSvc := service.NewAlias(l, paydStore, sqlLiteStore)
 	p2paymailSvc := service.NewP2Paymail(l, paydStore, p4Client, sqlLiteStore)
 
 	return &Deps{
 		PaymailService:   paymailSvc,
 		PkiService:       pkiSvc,
+		ProfileService:   profileSvc,
 		AliasService:     aliasSvc,
 		P2PaymailService: p2paymailSvc,
 	}
@@ -91,6 +94,7 @@ func SetupHTTPEndpoints(deps *Deps, e *echo.Echo) {
 	// handlers
 	paymailHandlers.NewCapabilitiesHandler(deps.PaymailService).RegisterRoutes(c)
 	paymailHandlers.NewPkiHandler(deps.PkiService).RegisterRoutes(g)
+	paymailHandlers.NewProfileHandler(deps.ProfileService).RegisterRoutes(g)
 	paymailHandlers.NewAliasHandler(deps.AliasService).RegisterRoutes(g)
 	paymailHandlers.NewP2PaymailHandler(deps.P2PaymailService).RegisterRoutes(g)
 }
