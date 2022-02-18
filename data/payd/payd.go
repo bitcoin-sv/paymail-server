@@ -4,13 +4,14 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/libsv/go-bk/envelope"
 	"github.com/pkg/errors"
 
 	"github.com/libsv/go-p4"
-	"github.com/libsv/p4-server/data"
 	"github.com/nch-bowstave/paymail/config"
+	"github.com/nch-bowstave/paymail/data"
 	"github.com/nch-bowstave/paymail/models"
 )
 
@@ -50,7 +51,7 @@ func (p *Payd) PaymentCreate(ctx context.Context, args p4.PaymentCreateArgs, req
 		SPVEnvelope:    req.SPVEnvelope,
 		ProofCallbacks: req.ProofCallbacks,
 	}
-	if err := p.client.Do(ctx, http.MethodPost, fmt.Sprintf(urlPayments, p.baseURL(), args.PaymentID), http.StatusNoContent, paymentReq, nil); err != nil {
+	if err := p.client.Do(ctx, http.MethodPost, fmt.Sprintf(urlPayments, p.baseURL(), args.PaymentID), nil, http.StatusNoContent, paymentReq, nil); err != nil {
 		return nil, err
 	}
 	return &p4.PaymentACK{
@@ -66,7 +67,7 @@ func (p *Payd) PaymentCreate(ctx context.Context, args p4.PaymentCreateArgs, req
 func (p *Payd) User(ctx context.Context, userID uint64) (*p4.Merchant, error) {
 	uid := fmt.Sprint(userID)
 	var user *p4.Merchant
-	if err := p.client.Do(ctx, http.MethodGet, fmt.Sprintf(urlUser, p.baseURL(), uid), http.StatusOK, nil, &user); err != nil {
+	if err := p.client.Do(ctx, http.MethodGet, fmt.Sprintf(urlUser, p.baseURL(), uid), nil, http.StatusOK, nil, &user); err != nil {
 		return nil, errors.WithStack(err)
 	}
 	return user, nil
@@ -74,7 +75,7 @@ func (p *Payd) User(ctx context.Context, userID uint64) (*p4.Merchant, error) {
 
 func (p *Payd) GetInvoiceByID(ctx context.Context, id string) (*models.Invoice, error) {
 	var res models.Invoice
-	if err := p.client.Do(ctx, http.MethodGet, fmt.Sprintf(urlGet, p.baseURL(), id), http.StatusOK, nil, &res); err != nil {
+	if err := p.client.Do(ctx, http.MethodGet, fmt.Sprintf(urlGet, p.baseURL(), id), nil, http.StatusOK, nil, &res); err != nil {
 		return nil, errors.WithStack(err)
 	}
 	return &res, nil
@@ -82,7 +83,12 @@ func (p *Payd) GetInvoiceByID(ctx context.Context, id string) (*models.Invoice, 
 
 func (p *Payd) CreateInvoice(ctx context.Context, req *models.InvoiceCreate) (*models.Invoice, error) {
 	var res models.Invoice
-	if err := p.client.Do(ctx, http.MethodPost, fmt.Sprintf(urlCreate, p.baseURL()), http.StatusCreated, &req, &res); err != nil {
+
+	headers := http.Header{}
+
+	headers.Add("x-user", strconv.FormatUint(req.UserID, 10))
+
+	if err := p.client.Do(ctx, http.MethodPost, fmt.Sprintf(urlCreate, p.baseURL()), headers, http.StatusCreated, &req, &res); err != nil {
 		return nil, errors.WithStack(err)
 	}
 	return &res, nil
@@ -90,7 +96,7 @@ func (p *Payd) CreateInvoice(ctx context.Context, req *models.InvoiceCreate) (*m
 
 func (p *Payd) Destinations(ctx context.Context, args p4.PaymentRequestArgs) (*p4.Destinations, error) {
 	var resp models.DestinationResponse
-	if err := p.client.Do(ctx, http.MethodGet, fmt.Sprintf(urlDestinations, p.baseURL(), args.PaymentID), http.StatusOK, nil, &resp); err != nil {
+	if err := p.client.Do(ctx, http.MethodGet, fmt.Sprintf(urlDestinations, p.baseURL(), args.PaymentID), nil, http.StatusOK, nil, &resp); err != nil {
 		return nil, errors.WithStack(err)
 	}
 	dests := &p4.Destinations{
@@ -113,7 +119,7 @@ func (p *Payd) Destinations(ctx context.Context, args p4.PaymentRequestArgs) (*p
 
 // ProofCreate will pass on the proof to a payd instance for storage.
 func (p *Payd) ProofCreate(ctx context.Context, args p4.ProofCreateArgs, req envelope.JSONEnvelope) error {
-	return errors.WithStack(p.client.Do(ctx, http.MethodPost, fmt.Sprintf(urlProofs, p.baseURL(), args.TxID), http.StatusCreated, req, nil))
+	return errors.WithStack(p.client.Do(ctx, http.MethodPost, fmt.Sprintf(urlProofs, p.baseURL(), args.TxID), nil, http.StatusCreated, req, nil))
 }
 
 // baseURL will return http or https depending on if we're using TLS.
@@ -129,7 +135,7 @@ func (p *Payd) CreateUser(ctx context.Context, req models.UserDetails) (*models.
 	if req.Name == "" || req.Email == "" {
 		return nil, errors.New("must include name and email for user registration.")
 	}
-	if err := p.client.Do(ctx, http.MethodPost, fmt.Sprintf(urlUserCreate, p.baseURL()), http.StatusOK, &req, &user); err != nil {
+	if err := p.client.Do(ctx, http.MethodPost, fmt.Sprintf(urlUserCreate, p.baseURL()), nil, http.StatusOK, &req, &user); err != nil {
 		return nil, errors.WithStack(err)
 	}
 	return user, nil
