@@ -1,57 +1,45 @@
 # Paymail Server
 
-Paymail Server is a basic reference implementation of the Paymail Standard service discovery protocol.
-This is written in go and integrates with a wallet running the Payment Protocol PayD Interface.
+This server runs a basic implementation of a Paymail standard service with cut down capabilities specifically built to 
+integrate with a Direct Payments wallet. The main purpose is to allow incoming funds from existing paymail services.
 
-For the most part is does two things.
-
- - Generates two capabilities files for static hosting.
- - Responds to pki and p2paymail capability requests
-
-The p2paymail standard is a halfway point between standard bitcoin address use, and proper SPV. 
-Under the hood, this server will translate between p2paymail and invoice based payments to minimise creation of code we know will 
-likely be decprecated after widespread SPV is in use. In the mean time this can act as a bridge between those worlds.
+Bitcoin wallets such as Handcash & MoneyButton implement a server to server paymail capability with brfcids 2a40af698840 and 5f1323cddf31 
+which are a step away from standard bitcoin address use, towards proper SPV. This server will act as a bridge between the old and new,
+by translating between that legacy protocol and the full SPV direct payment protocol.
 
 ## Configuring Paymail
 
 The server has a series of environment variables that allow you to configure the behaviours and integrations of the server.
-Values can also be passed at build time to provide information such as build information, region, version etc.
 
 ### Server
 
-| Key                    | Description                                                           | Default        |
-|------------------------|-----------------------------------------------------------------------|----------------|
-| DOMAIN_TLD             | Domain name and top level domain on which this paymail service runs   | nchain.com     |
-| SERVER_PORT            | Port which this server should use                                     | :8446          |
-| SERVER_HOST            | Host name under which this server is found                            | paymail        |
-| SERVER_SWAGGER_ENABLED | If set to true we will expose an endpoint hosting the Swagger docs    | true           |
-| SERVER_SWAGGER_HOST    | Sets the base url for swagger ui calls                                | localhost:8446 |
+| Key                    | Description                                                            | Default          |
+|------------------------|------------------------------------------------------------------------|------------------|
+| DOMAIN_TLD             | Domain name and top level domain on which this paymail service runs    | carefulbear.com  |
+| SERVER_PORT            | Port which this server should use                                      | :8446            |
+| SERVER_HOST            | Host name under which this server is found                             | paymail          |
+| PAYD_HOST              | Host for the wallet we are connecting to                               | payd             |
+| PAYD_PORT              | Port the PayD wallet is listening on                                   | :8443            |
 
-### Environment / Deployment Info
+### DNS Records
 
-| Key                 | Description                                                                | Default          |
-|---------------------|----------------------------------------------------------------------------|------------------|
-| ENV_ENVIRONMENT     | What enviornment we are running in, for example 'production'               | dev              |
-| ENV_REGION          | Region we are running in, for example 'eu-west-1'                          | local            |
-| ENV_COMMIT          | Commit hash for the current build                                          | test             |
-| ENV_VERSION         | Semver tag for the current build, for example v1.0.0                       | v0.0.0           |
-| ENV_BUILDDATE       | Date the code was build                                                    | Current UTC time |
-| ENV_BITCOIN_NETWORK | What bitcoin network we are connecting to (mainnet, testnet, stn, regtest) | regtest          |
+In order to work with existing infrastructure, an SRV record is required pointing your desired domain at the domain you're running this server from.
+```
+# SRV Record
+_bsvalias._tcp.yourdomain.com. 3600    10 10 443 where-ever-you-are-running-this-code.com.
 
-### Logging
+# sometimes registrars will make you separate out these values, if so they are as follows:
+service: bsvalias
+protocol: tcp
+TTL: 3600
+Priority: 10
+Weight: 10
+Host: where-ever-you-are-running-this-code.com.
 
-| Key       | Description                                                           | Default |
-|-----------|-----------------------------------------------------------------------|---------|
-| LOG_LEVEL | Level of logging we want within the server (debug, error, warn, info) | info    |
+```
 
-### PayD Wallet
+Needless to say the `where-ever-you-are-running-this-code.com.` must point to your host IP via an A record. If the domain is different then DNSSEC is required. Read more about the [Paymail Standard](https://tsc.bitcoinassociation.net/standards/paymail/) for details.
 
-| Key         | Description                                              | Default |
-|-------------|----------------------------------------------------------|---------|
-| PAYD_HOST   | Host for the wallet we are connecting to                 | payd    |
-| PAYD_PORT   | Port the PayD wallet is listening on                     | :8443   |
-| PAYD_SECURE | If true the P4 server will validate the wallet TLS certs | false   |
-| PAYD_NOOP   | If true we will use a dummy data store in place of payd  | true    |
 
 ## Working with Paymail Server
 
