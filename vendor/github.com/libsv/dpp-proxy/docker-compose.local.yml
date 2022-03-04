@@ -1,0 +1,14 @@
+version: "3.7"
+
+services:
+  dpp:
+    container_name: dpp
+    image: local.dpp
+    environment:
+      SOCKET_CHANNEL_TIMEOUTSECONDS: 120
+
+  dpp-merchant:
+    container_name: dpp-merchant
+    image: local.dpp
+    environment:
+      SOCKET_CHANNEL_TIMEOUTSECONDS: 120

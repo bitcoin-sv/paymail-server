@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/libsv/p4-server/log"
+	"github.com/libsv/dpp-proxy/log"
 	"github.com/nch-bowstave/paymail/data/payd"
 	"github.com/nch-bowstave/paymail/data/sqlite"
 )

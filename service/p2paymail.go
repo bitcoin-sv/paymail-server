@@ -4,11 +4,10 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/libsv/dpp-proxy/log"
 	"github.com/libsv/go-bc/spv"
-	"github.com/libsv/go-bt/v2"
-	"github.com/libsv/go-p4"
-	"github.com/libsv/p4-server/log"
-	data "github.com/nch-bowstave/paymail/data/p4"
+	"github.com/libsv/go-dpp"
+	dppData "github.com/nch-bowstave/paymail/data/dpp"
 	paydData "github.com/nch-bowstave/paymail/data/payd"
 	"github.com/nch-bowstave/paymail/data/sqlite"
 	"github.com/nch-bowstave/paymail/models"
@@ -55,16 +54,16 @@ type TxReceipt struct {
 type p2Paymail struct {
 	l    log.Logger
 	payd *paydData.Payd
-	p4   data.P4
+	dpp  dppData.DPP
 	pki  sqlite.AliasStore
 }
 
 // NewPaymail will create and return a new paymail service.
-func NewP2Paymail(l log.Logger, payd *paydData.Payd, p4Client data.P4, pkiStr sqlite.AliasStore) *p2Paymail {
+func NewP2Paymail(l log.Logger, payd *paydData.Payd, dppClient dppData.DPP, pkiStr sqlite.AliasStore) *p2Paymail {
 	return &p2Paymail{
 		l:    l,
 		payd: payd,
-		p4:   p4Client,
+		dpp:  dppClient,
 		pki:  pkiStr,
 	}
 }
@@ -91,11 +90,11 @@ func (svc *p2Paymail) Destinations(ctx context.Context, paymail string, args Des
 		return nil, err
 	}
 
-	destReq := models.P4PayRequest{
-		PayToURL: fmt.Sprintf("http://%s/api/v1/payment/%s", svc.p4.Host(), invoice.ID),
+	destReq := models.DPPPayRequest{
+		PayToURL: fmt.Sprintf("http://%s/api/v1/payment/%s", svc.dpp.Host(), invoice.ID),
 	}
-	// grab some destinations from P4
-	response, err := svc.p4.PaymentRequest(ctx, destReq)
+	// grab some destinations from DPP
+	response, err := svc.dpp.PaymentRequest(ctx, destReq)
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +114,7 @@ func (svc *p2Paymail) Destinations(ctx context.Context, paymail string, args Des
 }
 
 func (svc *p2Paymail) RawTx(ctx context.Context, args TxSubmitArgs) (*TxReceipt, error) {
-	pcArgs := p4.PaymentCreateArgs{PaymentID: args.Reference}
+	pcArgs := dpp.PaymentCreateArgs{PaymentID: args.Reference}
 	invoice, err := svc.payd.GetInvoiceByID(ctx, args.Reference)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("invoice either doesn't exist or has been deleted %s", args.Reference))
@@ -123,8 +122,8 @@ func (svc *p2Paymail) RawTx(ctx context.Context, args TxSubmitArgs) (*TxReceipt,
 	if invoice.State == models.StateInvoiceDeleted {
 		return nil, errors.New(fmt.Sprintf("invoice either doesn't exist or has been deleted %s", args.Reference))
 	}
-	req := p4.Payment{
-		MerchantData: p4.Merchant{
+	req := dpp.Payment{
+		MerchantData: dpp.Merchant{
 			Name: args.MetaData.Signature,
 			ExtendedData: map[string]interface{}{
 				"paymail":   args.MetaData.Sender,
@@ -147,15 +146,9 @@ func (svc *p2Paymail) RawTx(ctx context.Context, args TxSubmitArgs) (*TxReceipt,
 		return nil, err
 	}
 
-	tx, err := bt.NewTxFromString(*receipt.Payment.RawTX)
-	if err != nil {
-		return nil, err
-	}
-	txid := tx.TxID()
-
 	dest := &TxReceipt{
-		TxID: txid,
-		Note: receipt.Payment.Memo,
+		TxID: receipt.TxID,
+		Note: receipt.Memo,
 	}
 	return dest, nil
 }

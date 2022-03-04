@@ -51,7 +51,7 @@ func main() {
 		WithDeployment(appname).
 		WithLog().
 		WithPayD().
-		WithP4().
+		WithDPP().
 		WithPaymail().
 		WithTransports().
 		Load()

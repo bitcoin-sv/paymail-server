@@ -5,7 +5,7 @@ package mocks
 
 import (
 	"context"
-	"github.com/libsv/p4-server/data"
+	"github.com/libsv/dpp-proxy/data"
 	"sync"
 )
 

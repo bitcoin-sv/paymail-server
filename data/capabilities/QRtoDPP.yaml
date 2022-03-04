@@ -6,5 +6,5 @@ authors:
   - Mark (nChain)
   - Deggen (nChain)
 version: 1.0
-callback: /p4/api/v1/payment/{paymentID}
+callback: /dpp/api/v1/payment/{paymentID}
 readme: https://libsv.github.io/

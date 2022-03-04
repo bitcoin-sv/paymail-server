@@ -11,7 +11,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/nch-bowstave/paymail/config"
 	"github.com/nch-bowstave/paymail/data"
-	p4Data "github.com/nch-bowstave/paymail/data/p4"
+	dppData "github.com/nch-bowstave/paymail/data/dpp"
 	"github.com/nch-bowstave/paymail/data/payd"
 	sql "github.com/nch-bowstave/paymail/data/sqlite"
 	"github.com/nch-bowstave/paymail/docs"
@@ -45,7 +45,7 @@ func SetupDeps(cfg config.Config, l log.Logger, db *sqlx.DB) *Deps {
 	// stores
 	httpDataClient := data.NewClient(httpClient)
 	paydStore := payd.NewPayD(cfg.PayD, httpDataClient)
-	p4Client := p4Data.NewP4(cfg.P4, httpDataClient)
+	dppClient := dppData.NewDPP(cfg.DPP, httpDataClient)
 	sqlLiteStore := sql.NewSQLiteStore(db)
 
 	// services
@@ -53,7 +53,7 @@ func SetupDeps(cfg config.Config, l log.Logger, db *sqlx.DB) *Deps {
 	pkiSvc := service.NewPki(l, paydStore, sqlLiteStore)
 	profileSvc := service.NewProfile(l, paydStore, sqlLiteStore)
 	aliasSvc := service.NewAlias(l, paydStore, sqlLiteStore)
-	p2paymailSvc := service.NewP2Paymail(l, paydStore, p4Client, sqlLiteStore)
+	p2paymailSvc := service.NewP2Paymail(l, paydStore, dppClient, sqlLiteStore)
 
 	return &Deps{
 		PaymailService:   paymailSvc,

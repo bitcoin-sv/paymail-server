@@ -42,9 +42,9 @@ func SetupDefaults() {
 	// paymail
 	viper.SetDefault(EnvPaymailRoot, "https://paymail.carefulbear.com")
 
-	// p4
-	viper.SetDefault(EnvP4Timeout, 30)
-	viper.SetDefault(EnvP4Host, "p4:8445")
+	// dpp
+	viper.SetDefault(EnvDPPTimeout, 30)
+	viper.SetDefault(EnvDPPHost, "dpp:8445")
 
 	// Socket settings
 	viper.SetDefault(EnvSocketChannelTimeoutSeconds, 7200*time.Second) // 2 hrs in seconds
