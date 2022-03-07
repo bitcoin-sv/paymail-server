@@ -55,15 +55,15 @@ func (p *Payd) PaymentCreate(ctx context.Context, args dpp.PaymentCreateArgs, re
 		return nil, err
 	}
 	return &dpp.PaymentACK{
-		ID:   "",
-		TxID: "",
+		ID:   args.PaymentID,
+		TxID: paymentReq.SPVEnvelope.TxID,
 		Memo: req.Memo,
-		PeerChannel: &dpp.PeerChannelData{
-			Host:      "",
-			ChannelID: "",
-			Token:     "",
-		},
-		Error: 0,
+		// TODO: find correct args
+		// PeerChannel: &dpp.PeerChannelData{
+		// 	Host:      "",
+		// 	ChannelID: "",
+		// 	Token:     "",
+		// },
 	}, nil
 }
 
