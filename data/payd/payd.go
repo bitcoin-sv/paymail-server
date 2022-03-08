@@ -58,12 +58,6 @@ func (p *Payd) PaymentCreate(ctx context.Context, args dpp.PaymentCreateArgs, re
 		ID:   args.PaymentID,
 		TxID: paymentReq.SPVEnvelope.TxID,
 		Memo: req.Memo,
-		// TODO: find correct args
-		// PeerChannel: &dpp.PeerChannelData{
-		// 	Host:      "",
-		// 	ChannelID: "",
-		// 	Token:     "",
-		// },
 	}, nil
 }
 
