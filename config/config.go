@@ -23,8 +23,8 @@ const (
 	EnvPaydSecure                  = "payd.secure"
 	EnvPaydCertPath                = "payd.cert.path"
 	EnvPaydNoop                    = "payd.noop"
-	EnvP4Timeout                   = "p4.timeout"
-	EnvP4Host                      = "p4.host"
+	EnvDPPTimeout                  = "dpp.timeout"
+	EnvDPPHost                     = "dpp.host"
 	EnvSocketChannelTimeoutSeconds = "socket.channel.timeoutseconds"
 	EnvSocketMaxMessageBytes       = "socket.maxmessage.bytes"
 	EnvTransportMode               = "transport.mode"
@@ -51,7 +51,7 @@ type Config struct {
 	Server     *Server
 	Deployment *Deployment
 	PayD       *PayD
-	P4         *P4
+	DPP        *DPP
 	Paymail    *Paymail
 	Sockets    *Socket
 	Transports *Transports
@@ -124,8 +124,8 @@ type PayD struct {
 	Noop            bool
 }
 
-// P4 contains information relating to a p4 interactions.
-type P4 struct {
+// DPP contains information relating to a dpp interactions.
+type DPP struct {
 	Timeout    int
 	ServerHost string
 }
@@ -140,7 +140,7 @@ type Socket struct {
 	ChannelTimeout  time.Duration
 }
 
-// Transports enables or disables p4 transports.
+// Transports enables or disables dpp transports.
 type Transports struct {
 	Mode string
 }
@@ -153,7 +153,7 @@ type ConfigurationLoader interface {
 	WithDeployment(app string) ConfigurationLoader
 	WithLog() ConfigurationLoader
 	WithPayD() ConfigurationLoader
-	WithP4() ConfigurationLoader
+	WithDPP() ConfigurationLoader
 	WithSockets() ConfigurationLoader
 	WithTransports() ConfigurationLoader
 	WithPaymail() ConfigurationLoader

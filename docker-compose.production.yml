@@ -32,12 +32,12 @@ services:
       DB_DSN: "file:paydb/wallet.db?cache=shared&_foreign_keys=true"
       DB_SCHEMA_PATH: "migrations"
       LOG_LEVEL: "debug"
-      P4_HOST: "http://p4:8445"
+      DPP_HOST: "http://dpp:8445"
       WALLET_NETWORK: "mainnet"
       MAPI_MINERNAME: "TAAL"
       MAPI_MINERURL: "https://mapi.taal.com"
       MAPI_TOKEN: "mainnet_4c64b811647e331e46a5c62928fa691e"
-      MAPI_CALLBACK_HOST: "https://paymail.carefulbear.com/p4"
+      MAPI_CALLBACK_HOST: "https://paymail.carefulbear.com/dpp"
       TRANSPORT_MODE: "http"
     healthcheck:
       test: [ "CMD", "curl", "-f", "localhost:8443/api/v1/health" ]
@@ -50,9 +50,9 @@ services:
     networks:
       - mainnet
 
-  p4:
-    container_name: p4
-    image: deggen88/p4
+  dpp:
+    container_name: dpp
+    image: deggen88/dpp
     restart: always
     environment:
       LOG_LEVEL: "debug"
@@ -93,12 +93,12 @@ services:
       DB_DSN: "file:paydb/wallet.db?cache=shared&_foreign_keys=true"
       DB_SCHEMA_PATH: "migrations"
       LOG_LEVEL: "debug"
-      P4_HOST: "http://p4:8445"
+      DPP_HOST: "http://dpp:8445"
       WALLET_NETWORK: "testnet"
       MAPI_MINERNAME: "TAAL"
       MAPI_MINERURL: "https://mapi.taal.com"
       MAPI_TOKEN: "testnet_fe512c5344dd35a1d2e756f44b920018"
-      MAPI_CALLBACK_HOST: "https://paymail.carefulbear.com/testnet/p4"
+      MAPI_CALLBACK_HOST: "https://paymail.carefulbear.com/testnet/dpp"
       TRANSPORT_MODE: "http"
     healthcheck:
       test: [ "CMD", "curl", "-f", "localhost:28443/api/v1/health" ]
@@ -111,9 +111,9 @@ services:
     networks:
       - testnet
 
-  test_p4:
-    container_name: test_p4
-    image: deggen88/p4
+  test_dpp:
+    container_name: test_dpp
+    image: deggen88/dpp
     restart: always
     environment:
       LOG_LEVEL: "debug"

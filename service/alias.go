@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	"github.com/libsv/p4-server/log"
+	"github.com/libsv/dpp-proxy/log"
 	"github.com/nch-bowstave/paymail/data/payd"
 	"github.com/nch-bowstave/paymail/data/sqlite"
 	"github.com/nch-bowstave/paymail/models"

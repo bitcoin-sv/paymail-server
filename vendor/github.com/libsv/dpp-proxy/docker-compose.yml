@@ -1,0 +1,34 @@
+version: "3.7"
+
+services:
+  dpp:
+    container_name: dpp
+    image: local.dpp
+    environment:
+      LOG_LEVEL: "info"
+      TRANSPORT_MODE: 'hybrid'
+    ports:
+      - "8445:8445"
+    networks:
+      - regtest-stack
+
+  dpp-merchant:
+    container_name: dpp-merchant
+    image: local.dpp
+    environment:
+      LOG_LEVEL: "info"
+      PAYD_HOST: "payd-merchant"
+      PAYD_PORT: ":28443"
+      TRANSPORT_MODE: 'hybrid'
+      SERVER_FQDN: 'dpp-merchant:28445'
+      SERVER_HOST: "dpp-merchant"
+      SERVER_PORT: ":28445"
+    ports:
+      - "28445:28445"
+    networks:
+      - regtest-stack
+
+networks:
+  regtest-stack:
+    external: true
+    name: regtest-stack

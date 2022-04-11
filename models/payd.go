@@ -7,14 +7,14 @@ import (
 	"github.com/libsv/go-bt/v2"
 	"gopkg.in/guregu/null.v3"
 
-	"github.com/libsv/go-p4"
+	"github.com/libsv/go-dpp"
 )
 
 // PayDPaymentRequest is used to send a payment to PayD for valdiation and storage.
 type PayDPaymentRequest struct {
-	SPVEnvelope    *spv.Envelope               `json:"spvEnvelope"`
-	RawTX          *string                     `json:"rawTx"`
-	ProofCallbacks map[string]p4.ProofCallback `json:"proofCallbacks"`
+	SPVEnvelope    *spv.Envelope                `json:"spvEnvelope"`
+	RawTX          *string                      `json:"rawTx"`
+	ProofCallbacks map[string]dpp.ProofCallback `json:"proofCallbacks"`
 }
 
 // Destination is a payment output with locking script.

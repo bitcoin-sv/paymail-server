@@ -30,8 +30,8 @@ services:
       DB_DSN: "file:paydb/wallet.db?cache=shared&_foreign_keys=true"
       DB_SCHEMA_PATH: "migrations"
       LOG_LEVEL: "debug"
-      P4_HOST: "http://p4:8445"
-      MAPI_CALLBACK_HOST: "http://p4:8445"
+      DPP_HOST: "http://dpp:8445"
+      MAPI_CALLBACK_HOST: "http://dpp:8445"
       TRANSPORT_MODE: "http"
     healthcheck:
       test: [ "CMD", "curl", "-f", "localhost:8443/api/v1/health" ]
@@ -44,9 +44,9 @@ services:
     networks:
       - regtest-stack
 
-  p4:
-    container_name: p4
-    image: local.p4
+  dpp:
+    container_name: dpp
+    image: local.dpp
     environment:
       LOG_LEVEL: "debug"
       TRANSPORT_MODE: 'http'

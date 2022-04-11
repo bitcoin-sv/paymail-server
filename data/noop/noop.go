@@ -3,10 +3,11 @@ package noop
 import (
 	"context"
 
+	"github.com/libsv/dpp-proxy/log"
 	"github.com/libsv/go-bt/v2"
-	"github.com/libsv/p4-server/log"
+	"github.com/libsv/go-bt/v2/bscript"
 
-	"github.com/libsv/go-p4"
+	"github.com/libsv/go-dpp"
 )
 
 type noop struct {
@@ -24,18 +25,18 @@ func NewNoOp(l log.Logger) *noop {
 // PaymentCreate will post a request to payd to validate and add the txos to the wallet.
 //
 // If invalid a non 204 status code is returned.
-func (n *noop) PaymentCreate(ctx context.Context, args p4.PaymentCreateArgs, req p4.Payment) (*p4.PaymentACK, error) {
+func (n *noop) PaymentCreate(ctx context.Context, args dpp.PaymentCreateArgs, req dpp.Payment) (*dpp.PaymentACK, error) {
 	n.l.Info("hit noop.PaymentCreate")
-	return &p4.PaymentACK{}, nil
+	return &dpp.PaymentACK{}, nil
 }
 
 // Owner will return information regarding the owner of a payd wallet.
 //
 // In this example, the payd wallet has no auth, in proper implementations auth would
 // be enabled and a cookie / oauth / bearer token etc would be passed down.
-func (n *noop) User(ctx context.Context) (*p4.Merchant, error) {
+func (n *noop) User(ctx context.Context) (*dpp.Merchant, error) {
 	n.l.Info("hit noop.Owner")
-	return &p4.Merchant{
+	return &dpp.Merchant{
 		AvatarURL:    "noop",
 		Name:         "noop",
 		Email:        "noop",
@@ -44,13 +45,13 @@ func (n *noop) User(ctx context.Context) (*p4.Merchant, error) {
 	}, nil
 }
 
-func (n *noop) Destinations(ctx context.Context, args p4.PaymentRequestArgs) (*p4.Destinations, error) {
+func (n *noop) Destinations(ctx context.Context, args dpp.PaymentRequestArgs) (*dpp.Destinations, error) {
 	n.l.Info("hit noop.Destinations")
-	return &p4.Destinations{
-		Outputs: []p4.Output{{
-			Amount:      0,
-			Script:      "noop",
-			Description: "noop",
+	return &dpp.Destinations{
+		Outputs: []dpp.Output{{
+			Amount:        0,
+			LockingScript: &bscript.Script{},
+			Description:   "noop",
 		}},
 		Fees: bt.NewFeeQuote(),
 	}, nil

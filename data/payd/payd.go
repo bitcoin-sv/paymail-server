@@ -6,10 +6,11 @@ import (
 	"net/http"
 
 	"github.com/libsv/go-bk/envelope"
+	"github.com/libsv/go-bt/v2/bscript"
 	"github.com/pkg/errors"
 
-	"github.com/libsv/go-p4"
-	"github.com/libsv/p4-server/data"
+	"github.com/libsv/dpp-proxy/data"
+	"github.com/libsv/go-dpp"
 	"github.com/nch-bowstave/paymail/config"
 	"github.com/nch-bowstave/paymail/models"
 )
@@ -44,7 +45,7 @@ func NewPayD(cfg *config.PayD, client data.HTTPClient) *Payd {
 // PaymentCreate will post a request to payd to validate and add the txos to the wallet.
 //
 // If invalid a non 204 status code is returned.
-func (p *Payd) PaymentCreate(ctx context.Context, args p4.PaymentCreateArgs, req p4.Payment) (*p4.PaymentACK, error) {
+func (p *Payd) PaymentCreate(ctx context.Context, args dpp.PaymentCreateArgs, req dpp.Payment) (*dpp.PaymentACK, error) {
 	paymentReq := models.PayDPaymentRequest{
 		RawTX:          req.RawTX,
 		SPVEnvelope:    req.SPVEnvelope,
@@ -53,9 +54,10 @@ func (p *Payd) PaymentCreate(ctx context.Context, args p4.PaymentCreateArgs, req
 	if err := p.client.Do(ctx, http.MethodPost, fmt.Sprintf(urlPayments, p.baseURL(), args.PaymentID), http.StatusNoContent, paymentReq, nil); err != nil {
 		return nil, err
 	}
-	return &p4.PaymentACK{
-		Memo:    req.Memo,
-		Payment: &req,
+	return &dpp.PaymentACK{
+		ID:   args.PaymentID,
+		TxID: paymentReq.SPVEnvelope.TxID,
+		Memo: req.Memo,
 	}, nil
 }
 
@@ -63,9 +65,9 @@ func (p *Payd) PaymentCreate(ctx context.Context, args p4.PaymentCreateArgs, req
 //
 // In this example, the payd wallet has no auth, in proper implementations auth would
 // be enabled and a cookie / oauth / bearer token etc would be passed down.
-func (p *Payd) User(ctx context.Context, userID uint64) (*p4.Merchant, error) {
+func (p *Payd) User(ctx context.Context, userID uint64) (*dpp.Merchant, error) {
 	uid := fmt.Sprint(userID)
-	var user *p4.Merchant
+	var user *dpp.Merchant
 	if err := p.client.Do(ctx, http.MethodGet, fmt.Sprintf(urlUser, p.baseURL(), uid), http.StatusOK, nil, &user); err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -88,23 +90,24 @@ func (p *Payd) CreateInvoice(ctx context.Context, req *models.InvoiceCreate) (*m
 	return &res, nil
 }
 
-func (p *Payd) Destinations(ctx context.Context, args p4.PaymentRequestArgs) (*p4.Destinations, error) {
+func (p *Payd) Destinations(ctx context.Context, args dpp.PaymentRequestArgs) (*dpp.Destinations, error) {
 	var resp models.DestinationResponse
 	if err := p.client.Do(ctx, http.MethodGet, fmt.Sprintf(urlDestinations, p.baseURL(), args.PaymentID), http.StatusOK, nil, &resp); err != nil {
 		return nil, errors.WithStack(err)
 	}
-	dests := &p4.Destinations{
+	dests := &dpp.Destinations{
 		SPVRequired: resp.SPVRequired,
 		Network:     resp.Network,
-		Outputs:     make([]p4.Output, 0),
+		Outputs:     make([]dpp.Output, 0),
 		Fees:        resp.Fees,
 		CreatedAt:   resp.CreatedAt,
 		ExpiresAt:   resp.ExpiresAt,
 	}
 	for _, o := range resp.Outputs {
-		dests.Outputs = append(dests.Outputs, p4.Output{
-			Amount: o.Satoshis,
-			Script: o.Script,
+		s, _ := bscript.NewFromHexString(o.Script)
+		dests.Outputs = append(dests.Outputs, dpp.Output{
+			Amount:        o.Satoshis,
+			LockingScript: s,
 		})
 	}
 
@@ -112,7 +115,7 @@ func (p *Payd) Destinations(ctx context.Context, args p4.PaymentRequestArgs) (*p
 }
 
 // ProofCreate will pass on the proof to a payd instance for storage.
-func (p *Payd) ProofCreate(ctx context.Context, args p4.ProofCreateArgs, req envelope.JSONEnvelope) error {
+func (p *Payd) ProofCreate(ctx context.Context, args dpp.ProofCreateArgs, req envelope.JSONEnvelope) error {
 	return errors.WithStack(p.client.Do(ctx, http.MethodPost, fmt.Sprintf(urlProofs, p.baseURL(), args.TxID), http.StatusCreated, req, nil))
 }
 
