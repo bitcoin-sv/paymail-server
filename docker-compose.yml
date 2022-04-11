@@ -23,38 +23,6 @@ services:
     networks:
       - regtest-stack
 
-  payd:
-    container_name: payd
-    image: local.payd
-    environment:
-      DB_DSN: "file:paydb/wallet.db?cache=shared&_foreign_keys=true"
-      DB_SCHEMA_PATH: "migrations"
-      LOG_LEVEL: "debug"
-      DPP_HOST: "http://dpp:8445"
-      MAPI_CALLBACK_HOST: "http://dpp:8445"
-      TRANSPORT_MODE: "http"
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "localhost:8443/api/v1/health" ]
-      interval: 30s
-      timeout: 10s
-    volumes:
-      - payd-data:/paydb
-    ports:
-      - "8443:8443"
-    networks:
-      - regtest-stack
-
-  dpp:
-    container_name: dpp
-    image: local.dpp
-    environment:
-      LOG_LEVEL: "debug"
-      TRANSPORT_MODE: 'http'
-    ports:
-      - "8445:8445"
-    networks:
-      - regtest-stack
-
 volumes:
   payd-data:
     external: false
