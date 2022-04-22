@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/nch-bowstave/paymail/config"
-	"github.com/nch-bowstave/paymail/models"
+	"github.com/bitcoin-sv/paymail/config"
+	"github.com/bitcoin-sv/paymail/models"
 )
 
 // DPP interfaces interactions with a dpp server.

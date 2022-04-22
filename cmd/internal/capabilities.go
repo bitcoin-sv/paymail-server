@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 	"strings"
 
+	"github.com/bitcoin-sv/paymail/config"
+	"github.com/bitcoin-sv/paymail/data"
 	"github.com/libsv/go-bk/crypto"
 	"github.com/libsv/go-bt/v2"
-	"github.com/nch-bowstave/paymail/config"
-	"github.com/nch-bowstave/paymail/data"
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 )

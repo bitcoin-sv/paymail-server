@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 
+	"github.com/bitcoin-sv/paymail/data"
 	"github.com/libsv/dpp-proxy/log"
-	"github.com/nch-bowstave/paymail/data"
 )
 
 // CapabilitiesDocument is the whole response body for the capability discovery mechanism of Paymail.

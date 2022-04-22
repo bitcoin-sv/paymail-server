@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/nch-bowstave/paymail/models"
+	"github.com/bitcoin-sv/paymail/models"
 )
 
 const (

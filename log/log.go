@@ -1,7 +1,7 @@
 package log
 
 import (
-	"github.com/nch-bowstave/paymail/config"
+	"github.com/bitcoin-sv/paymail/config"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"

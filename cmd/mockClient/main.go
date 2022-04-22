@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/bitcoin-sv/paymail/data"
+	"github.com/bitcoin-sv/paymail/service"
 	"github.com/libsv/go-bn"
 	"github.com/libsv/go-bt/v2"
 	"github.com/libsv/go-bt/v2/bscript"
-	"github.com/nch-bowstave/paymail/data"
-	"github.com/nch-bowstave/paymail/service"
 )
 
 func main() {

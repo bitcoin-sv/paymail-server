@@ -9,10 +9,10 @@ import (
 	"github.com/libsv/go-bt/v2/bscript"
 	"github.com/pkg/errors"
 
+	"github.com/bitcoin-sv/paymail/config"
+	"github.com/bitcoin-sv/paymail/models"
 	"github.com/libsv/dpp-proxy/data"
 	"github.com/libsv/go-dpp"
-	"github.com/nch-bowstave/paymail/config"
-	"github.com/nch-bowstave/paymail/models"
 )
 
 // Known endpoints for the payd wallet implementing the payment protocol interface.

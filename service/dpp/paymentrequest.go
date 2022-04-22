@@ -7,8 +7,8 @@ import (
 	"github.com/pkg/errors"
 	validator "github.com/theflyingcodr/govalidator"
 
+	"github.com/bitcoin-sv/paymail/config"
 	"github.com/libsv/go-dpp"
-	"github.com/nch-bowstave/paymail/config"
 )
 
 type paymentRequest struct {

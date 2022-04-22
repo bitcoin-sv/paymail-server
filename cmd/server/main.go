@@ -6,10 +6,10 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/nch-bowstave/paymail/cmd/internal"
-	"github.com/nch-bowstave/paymail/config"
-	"github.com/nch-bowstave/paymail/config/databases"
-	"github.com/nch-bowstave/paymail/log"
+	"github.com/bitcoin-sv/paymail/cmd/internal"
+	"github.com/bitcoin-sv/paymail/config"
+	"github.com/bitcoin-sv/paymail/config/databases"
+	"github.com/bitcoin-sv/paymail/log"
 )
 
 const appname = "paymail-server"

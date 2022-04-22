@@ -3,10 +3,10 @@ package databases
 import (
 	"fmt"
 
+	"github.com/bitcoin-sv/paymail/log"
 	"github.com/jmoiron/sqlx"
-	"github.com/nch-bowstave/paymail/log"
 
-	"github.com/nch-bowstave/paymail/config"
+	"github.com/bitcoin-sv/paymail/config"
 )
 
 type dbSetupFunc func(l log.Logger, c *config.Db) (*sqlx.DB, error)

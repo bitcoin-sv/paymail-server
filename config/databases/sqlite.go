@@ -10,12 +10,12 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 
 	// used to import the sqlite drivers.
+	"github.com/bitcoin-sv/paymail/log"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/nch-bowstave/paymail/log"
 	"github.com/pkg/errors"
 
-	"github.com/nch-bowstave/paymail/config"
+	"github.com/bitcoin-sv/paymail/config"
 )
 
 func setupSqliteDB(l log.Logger, c *config.Db) (*sqlx.DB, error) {

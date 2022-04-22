@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/bitcoin-sv/paymail/data/payd"
+	"github.com/bitcoin-sv/paymail/data/sqlite"
 	"github.com/libsv/dpp-proxy/log"
-	"github.com/nch-bowstave/paymail/data/payd"
-	"github.com/nch-bowstave/paymail/data/sqlite"
 )
 
 type pki struct {

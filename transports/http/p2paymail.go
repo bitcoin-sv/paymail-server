@@ -3,8 +3,8 @@ package http
 import (
 	"net/http"
 
+	"github.com/bitcoin-sv/paymail/service"
 	"github.com/labstack/echo/v4"
-	"github.com/nch-bowstave/paymail/service"
 	"github.com/pkg/errors"
 )
 

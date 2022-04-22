@@ -3,10 +3,10 @@ package service
 import (
 	"context"
 
+	"github.com/bitcoin-sv/paymail/data/payd"
+	"github.com/bitcoin-sv/paymail/data/sqlite"
+	"github.com/bitcoin-sv/paymail/models"
 	"github.com/libsv/dpp-proxy/log"
-	"github.com/nch-bowstave/paymail/data/payd"
-	"github.com/nch-bowstave/paymail/data/sqlite"
-	"github.com/nch-bowstave/paymail/models"
 	"github.com/pkg/errors"
 )
 

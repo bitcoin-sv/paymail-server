@@ -1,4 +1,4 @@
-module github.com/nch-bowstave/paymail
+module github.com/bitcoin-sv/paymail
 
 go 1.17
 
