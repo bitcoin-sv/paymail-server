@@ -90,7 +90,7 @@ func (svc *p2Paymail) Destinations(ctx context.Context, paymail string, args Des
 		return nil, err
 	}
 
-	destReq := models.DPPPayRequest{
+	destReq := models.PayRequest{
 		PayToURL: fmt.Sprintf("http://%s/api/v1/payment/%s", svc.dpp.Host(), invoice.ID),
 	}
 	// grab some destinations from DPP

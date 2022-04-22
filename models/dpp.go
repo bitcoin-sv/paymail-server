@@ -7,33 +7,33 @@ import (
 	"github.com/libsv/go-bt/v2"
 )
 
-type DPPPayRequest struct {
+type PayRequest struct {
 	PayToURL string `json:"payToURL"`
 }
 
-// DPPOutput an output matching what a dpp server expects.
-type DPPOutput struct {
+// Output an output matching what a dpp server expects.
+type Output struct {
 	Amount      uint64 `json:"amount"`
 	Script      string `json:"script"`
 	Description string `json:"description"`
 }
 
-// DPPDestination defines a dpp payment destination object.
-type DPPDestination struct {
-	Outputs []DPPOutput `json:"outputs"`
+// Destination defines a dpp payment destinations object.
+type Destinations struct {
+	Outputs []Output `json:"outputs"`
 }
 
-// PaymentRequestResponse
-type PaymentRequest struct {
-	Network             string         `json:"network"`
-	Destinations        DPPDestination `json:"destinations"`
-	CreationTimestamp   time.Time      `json:"creationTimestamp"`
-	ExpirationTimestamp time.Time      `json:"expirationTimestamp"`
-	PaymentURL          string         `json:"paymentURL"`
-	Memo                string         `json:"memo"`
-	MerchantData        User           `json:"merchantData"`
-	Fee                 *bt.FeeQuote   `json:"fees"`
-	AncestryRequired    bool           `json:"ancestryRequired" example:"true"`
+// PaymentTerms is the response body from a payment request.
+type PaymentTerms struct {
+	Network             string       `json:"network"`
+	Destinations        Destinations `json:"destinations"`
+	CreationTimestamp   time.Time    `json:"creationTimestamp"`
+	ExpirationTimestamp time.Time    `json:"expirationTimestamp"`
+	PaymentURL          string       `json:"paymentURL"`
+	Memo                string       `json:"memo"`
+	MerchantData        User         `json:"merchantData"`
+	Fee                 *bt.FeeQuote `json:"fees"`
+	AncestryRequired    bool         `json:"ancestryRequired" example:"true"`
 }
 
 // Merchant to be displayed to the user.
