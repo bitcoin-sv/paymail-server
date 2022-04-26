@@ -7,71 +7,33 @@ import (
 	"github.com/libsv/go-bt/v2"
 )
 
-type DPPPayRequest struct {
+type PayRequest struct {
 	PayToURL string `json:"payToURL"`
 }
 
-// Output message used in BIP270.
-// See https://github.com/moneybutton/bips/blob/master/bip-0270.mediawiki#output
+// Output an output matching what a dpp server expects.
 type Output struct {
-	// Amount is the number of satoshis to be paid.
-	Amount uint64 `json:"amount" example:"100000"`
-	// Script is a locking script where payment should be sent, formatted as a hexadecimal string.
-	Script string `json:"script" example:"76a91455b61be43392125d127f1780fb038437cd67ef9c88ac"`
-	// Description, an optional description such as "tip" or "sales tax". Maximum length is 100 chars.
-	Description string `json:"description" example:"paymentReference 123456"`
+	Amount      uint64 `json:"amount"`
+	Script      string `json:"script"`
+	Description string `json:"description"`
 }
 
-// PaymentDestinations contains the supported destinations
-// by this DPP server.
-type PaymentDestinations struct {
+// Destination defines a dpp payment destinations object.
+type Destinations struct {
 	Outputs []Output `json:"outputs"`
 }
 
-// Destinations message containing outputs and their fees.
-type Destinations struct {
-	SPVRequired bool         `json:"spvRequired"`
-	Network     string       `json:"network"`
-	Outputs     []Output     `json:"outputs"`
-	Fees        *bt.FeeQuote `json:"fees"`
-	CreatedAt   time.Time    `json:"createdAt"`
-	ExpiresAt   time.Time    `json:"expiresAt"`
-}
-
-// PaymentRequest message used in BIP270.
-// See https://github.com/moneybutton/bips/blob/master/bip-0270.mediawiki#paymentrequest
-type PaymentRequest struct {
-	// Network  Always set to "bitcoin" (but seems to be set to 'bitcoin-sv'
-	// outside bip270 spec, see https://handcash.github.io/handcash-merchant-integration/#/merchant-payments)
-	// {enum: bitcoin, bitcoin-sv, test}
-	// Required.
-	Network string `json:"network" example:"mainnet" enums:"mainnet,testnet,stn,regtest"`
-	// SPVRequired if true will expect the sender to submit an SPVEnvelope in the payment request, otherwise
-	// a rawTx will be required.
-	SPVRequired bool `json:"spvRequired" example:"true"`
-	// Destinations contains supported payment destinations by the merchant and dpp server, initial P2PKH outputs but can be extended.
-	// Required.
-	Destinations PaymentDestinations `json:"destinations"`
-	// CreationTimestamp Unix timestamp (seconds since 1-Jan-1970 UTC) when the PaymentRequest was created.
-	// Required.
-	CreationTimestamp time.Time `json:"creationTimestamp" swaggertype:"primitive,string" example:"2019-10-12T07:20:50.52Z"`
-	// ExpirationTimestamp Unix timestamp (UTC) after which the PaymentRequest should be considered invalid.
-	// Optional.
-	ExpirationTimestamp time.Time `json:"expirationTimestamp" swaggertype:"primitive,string" example:"2019-10-12T07:20:50.52Z"`
-	// PaymentURL secure HTTPS location where a Payment message (see below) will be sent to obtain a PaymentACK.
-	// Maximum length is 4000 characters
-	PaymentURL string `json:"paymentUrl" example:"https://localhost:3443/api/v1/payment/123456"`
-	// Memo Optional note that should be displayed to the customer, explaining what this PaymentRequest is for.
-	// Maximum length is 50 characters.
-	Memo string `json:"memo" example:"invoice number 123456"`
-	// MerchantData contains arbitrary data that may be used by the payment host to identify the PaymentRequest.
-	// May be omitted if the payment host does not need to associate Payments with PaymentRequest
-	// or if they associate each PaymentRequest with a separate payment address.
-	// Maximum length is 10000 characters.
-	MerchantData *Merchant `json:"merchantData,omitempty"`
-	// FeeRate defines the amount of fees a users wallet should add to the payment
-	// when submitting their final payments.
-	FeeRate *bt.FeeQuote `json:"fees"`
+// PaymentTerms is the response body from a payment request.
+type PaymentTerms struct {
+	Network             string       `json:"network"`
+	Destinations        Destinations `json:"destinations"`
+	CreationTimestamp   time.Time    `json:"creationTimestamp"`
+	ExpirationTimestamp time.Time    `json:"expirationTimestamp"`
+	PaymentURL          string       `json:"paymentURL"`
+	Memo                string       `json:"memo"`
+	MerchantData        User         `json:"merchantData"`
+	Fee                 *bt.FeeQuote `json:"fees"`
+	AncestryRequired    bool         `json:"ancestryRequired" example:"true"`
 }
 
 // Merchant to be displayed to the user.
